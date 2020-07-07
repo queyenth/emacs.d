@@ -1,0 +1,8 @@
+*~
+places
+backups
+auto-save-list
+elpa/
+eshell
+lsp-cache
+.lsp-session*
