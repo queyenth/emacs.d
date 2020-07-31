@@ -18,21 +18,14 @@
 (setq-default cursor-type 'bar)
 (setq ring-bell-function 'ignore)
 
-; Golden Ratio
-(use-package golden-ratio
+(use-package base16-theme
              :ensure t
              :config
-             (golden-ratio-mode 1))
+             (load-theme 'base16-solarized-light t))
 
-; Helm, important Kappa
-(use-package helm
-  :ensure t
-  :config
-  (helm-mode 1))
-
-(use-package nord-theme
+(use-package telephone-line
              :ensure t
-             :init
-             (load-theme 'nord t))
+             :config
+             (telephone-line-mode 1))
 
 (provide 'init-ui)
