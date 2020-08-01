@@ -14,6 +14,8 @@
   apropos-do-all t
   mouse-yank-at-point t)
 
+(global-display-line-numbers-mode)
+
 (blink-cursor-mode 0)
 (setq-default cursor-type 'bar)
 (setq ring-bell-function 'ignore)
@@ -27,5 +29,7 @@
              :ensure t
              :config
              (telephone-line-mode 1))
+
+(set-default-font "Hack-10")
 
 (provide 'init-ui)
