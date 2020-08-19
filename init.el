@@ -11,6 +11,7 @@
 
 ; Now languages
 (require 'init-php)
+(require 'init-clojure)
 
 (provide 'init)
 
