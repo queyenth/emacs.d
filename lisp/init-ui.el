@@ -30,6 +30,7 @@
              :config
              (telephone-line-mode 1))
 
-(set-default-font "Hack-10")
+;;(set-default-font "Hack-10")
+(set-face-attribute 'default t :font "Hack-10")
 
 (provide 'init-ui)
