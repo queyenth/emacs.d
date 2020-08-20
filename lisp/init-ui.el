@@ -40,7 +40,7 @@
   :ensure t
   :init
   (setq dashboard-banner-logo-title "Oh, hello there!")
-  (setq dashboard-startup-banner "~/Downloads/banner_256.png")
+  (setq dashboard-startup-banner "~/.emacs.d/banner.png")
   (setq dashboard-center-content t)
   (setq dashboard-items '((recents . 5)
 			  (projects . 5)
