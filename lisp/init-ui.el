@@ -30,6 +30,27 @@
              :config
              (telephone-line-mode 1))
 
+(use-package page-break-lines
+  :ensure t)
+
+(use-package all-the-icons
+  :ensure t)
+
+(use-package dashboard
+  :ensure t
+  :init
+  (setq dashboard-banner-logo-title "Oh, hello there!")
+  (setq dashboard-startup-banner "~/Downloads/banner_256.png")
+  (setq dashboard-center-content t)
+  (setq dashboard-items '((recents . 5)
+			  (projects . 5)
+			  (agenda . 1)))
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  :config
+  (dashboard-setup-startup-hook))
+(setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+
 ;;(set-default-font "Hack-10")
 (set-face-attribute 'default t :font "Hack-10")
 
