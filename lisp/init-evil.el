@@ -3,6 +3,7 @@
 (setq evil-want-integration t)
 (setq evil-want-keybinding nil)
 
+;; TODO: I guess we're better set mode keybindings in use-package for corresponding mode?
 (use-package evil-leader
   :ensure t
   :init
@@ -48,6 +49,12 @@
     (evil-define-key 'operator global-map "S" 'evil-Surround-edit)
     (evil-define-key 'visual global-map "S" 'evil-surround-region)
     (evil-define-key 'visual global-map "gS" 'evil-Surround-region))
+
+  (use-package evil-commentary
+    :ensure t
+    :config
+    (evil-commentary-mode)
+    (evil-leader/set-key "c" 'evil-commentary-line))
 
   (use-package org-evil
     :ensure t))
