@@ -3,6 +3,10 @@
 (show-paren-mode 1)
 (global-hl-line-mode 1)
 
+(setq-default tab-width 4)
+(progn
+  (setq-default indent-tabs-mode nil))
+
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
 (setq-default save-place t)
