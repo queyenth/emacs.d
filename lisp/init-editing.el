@@ -16,4 +16,15 @@
 
 (setq auto-save-default nil)
 
+;; Packages
+(use-package company
+  :ensure t
+  :custom
+  (company-tooltip-limit 5)
+  (company-idle-delay 0.1)
+  (company-minimum-prefix-length 3)
+  (company-selection-wrap-around t)
+  (company-require-match 'never)
+  :hook (after-init . global-company-mode))
+
 (provide 'init-editing)
