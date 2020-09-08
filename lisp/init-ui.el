@@ -23,12 +23,20 @@
 (use-package base16-theme
              :ensure t
              :config
-             (load-theme 'base16-solarized-light t))
+             (load-theme 'base16-tomorrow t))
 
-(use-package telephone-line
-             :ensure t
-             :config
-             (telephone-line-mode 1))
+(use-package minions
+  :ensure t
+  :config
+  (minions-mode 1))
+
+(use-package smart-mode-line
+  :ensure t
+  :init
+  (setq sml/theme 'light)
+  (setq sml/no-confirm-load-theme t)
+  :config
+  (sml/setup))
 
 (use-package page-break-lines
   :ensure t)
