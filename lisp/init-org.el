@@ -10,11 +10,10 @@
   (setq org-refile-targets '(org-agenda-files :level . 1))
   (setq org-refile-use-outline-path 'file)
   (setq org-indent-indentation-per-level 1)
-  (setq org-adapt-indentation nil)
   (setq org-hide-leading-stars 't)
   (setq org-hide-emphasis-markers t)
-  (setq org-cycle-separator-lines 1)
   (setq org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
-  (setq org-agenda-files '("~/Default/org/life.org")))
+  (setq org-cycle-separator-lines 1)
+  (setq org-agenda-files (list (concat (getenv "SYNCTHING") "org"))))
 
 (provide 'init-org)
