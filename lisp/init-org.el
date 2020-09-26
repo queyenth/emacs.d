@@ -1,7 +1,9 @@
 (require 'init-elpa)
 
 (use-package org
-  :config
+  :init
+  (evil-leader/set-key-for-mode 'org-mode "a" 'org-agenda)
+
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
   (setq org-log-reschedule 'note)
