@@ -4,13 +4,11 @@
 (setq create-lockfiles nil)
 
 (use-package projectile
-  :ensure t
   :config
   (projectile-mode +1)
   (evil-leader/set-key "p" 'projectile-command-map))
 
 (use-package ivy
-  :ensure t
   :config
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)

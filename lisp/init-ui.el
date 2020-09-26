@@ -21,17 +21,14 @@
 (setq ring-bell-function 'ignore)
 
 (use-package base16-theme
-             :ensure t
              :config
              (load-theme 'base16-tomorrow t))
 
 (use-package minions
-  :ensure t
   :config
   (minions-mode 1))
 
 (use-package smart-mode-line
-  :ensure t
   :init
   (setq sml/theme 'light)
   (setq sml/no-confirm-load-theme t)
@@ -39,13 +36,10 @@
   (sml/setup))
 
 (use-package page-break-lines
-  :ensure t)
 
 (use-package all-the-icons
-  :ensure t)
 
 (use-package dashboard
-  :ensure t
   :init
   (setq dashboard-banner-logo-title "Oh, hello there!")
   (setq dashboard-startup-banner "~/.emacs.d/banner.png")

@@ -52,7 +52,6 @@
 
 ;; Packages
 (use-package company
-  :ensure t
   :custom
   (company-tooltip-limit 5)
   (company-idle-delay 0.1)

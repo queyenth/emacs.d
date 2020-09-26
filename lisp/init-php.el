@@ -1,9 +1,7 @@
 (require 'init-elpa)
 
-(use-package web-mode
-             :ensure t)
+(use-package web-mode)
 
-(use-package php-mode
-             :ensure t)
+(use-package php-mode)
 
 (provide 'init-php)

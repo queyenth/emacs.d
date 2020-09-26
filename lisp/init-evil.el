@@ -5,7 +5,6 @@
 
 ;; TODO: I guess we're better set mode keybindings in use-package for corresponding mode?
 (use-package evil-leader
-  :ensure t
   :init
   (global-evil-leader-mode)
   :config
@@ -13,7 +12,6 @@
   (evil-leader/set-key-for-mode 'org-mode "a" 'org-agenda))
 
 (use-package evil
-  :ensure t
   :after evil-leader
   :init
   (setq evil-search-module 'evil-search)
@@ -27,18 +25,15 @@
 
   (use-package evil-collection
     :after evil
-    :ensure t
     :config
     (evil-collection-init))
 
   (use-package evil-goggles
-    :ensure t
     :config
     (evil-goggles-use-diff-faces)
     (evil-goggles-mode))
 
   (use-package evil-surround
-    :ensure t
     :commands
     (evil-surround-edit
      evil-Surround-edit
@@ -51,12 +46,10 @@
     (evil-define-key 'visual global-map "gS" 'evil-Surround-region))
 
   (use-package evil-commentary
-    :ensure t
     :config
     (evil-commentary-mode)
     (evil-leader/set-key "c" 'evil-commentary-line))
 
-  (use-package org-evil
-    :ensure t))
+  (use-package org-evil))
 
 (provide 'init-evil)

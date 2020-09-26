@@ -1,7 +1,6 @@
 (require 'init-elpa)
 
 (use-package org
-  :ensure t
   :config
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
