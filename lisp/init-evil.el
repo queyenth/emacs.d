@@ -8,8 +8,7 @@
   :init
   (global-evil-leader-mode)
   :config
-  (evil-leader/set-leader ",")
-  (evil-leader/set-key-for-mode 'org-mode "a" 'org-agenda))
+  (evil-leader/set-leader "SPC"))
 
 (use-package evil
   :after evil-leader
@@ -19,7 +18,12 @@
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
   (setq evil-shift-round nil)
+
+  ; That doesn't work for some reason Idk
   (setq evil-want-C-u-scroll t)
+  ; So we use this :(
+  (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
+
   :config
   (evil-mode)
 
