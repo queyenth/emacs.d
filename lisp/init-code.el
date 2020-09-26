@@ -12,10 +12,6 @@
     :commands lsp-ui-mode)
 
   (use-package lsp-ivy
-    :commands lsp-ivy-workspace-symbol)
-
-  (use-package which-key
-    :config
-    (which-key-mode)))
+    :commands lsp-ivy-workspace-symbol))
 
 (provide 'init-code)
