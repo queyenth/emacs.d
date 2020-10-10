@@ -19,6 +19,13 @@
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
+(use-package ansi-color
+  :config
+  (defun qqq/colorize-compilation-buffer ()
+    (when (eq major-mode 'compilation-mode)
+      (ansi-color-apply-on-region compilation-filter-start (point-max))))
+  :hook (compilation-filter . qqq/colorize-compilation-buffer))
+
 ;(global-display-line-numbers-mode)
 (column-number-mode)
 (use-package linum-relative
