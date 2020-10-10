@@ -3,6 +3,10 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq create-lockfiles nil)
 
+(use-package expand-region
+  :config
+  (evil-leader/set-key "=" 'er/expand-region))
+
 (use-package projectile
   :diminish
   :custom
