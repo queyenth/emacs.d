@@ -188,7 +188,12 @@
     (add-hook 'lisp-mode-hook 'disable-tabs)
     (add-hook 'emacs-lisp-mode-hook 'disable-tabs)
   #+end_src
-
+* Undo Tree
+  #+begin_src emacs-lisp
+    (use-package undo-tree
+      :config
+      (global-undo-tree-mode))
+  #+end_src
 * Keybindings
 ** Evil
    First of all, let's install evil
@@ -197,6 +202,7 @@
      (setq evil-want-keybinding nil)
 
      (use-package evil
+       :custom ((evil-undo-system 'undo-tree))
        :init
        (setq evil-search-module 'evil-search)
        (setq evil-ex-complete-emacs-commands nil)
