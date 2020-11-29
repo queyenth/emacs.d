@@ -27,6 +27,9 @@
 
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 
+(setq custom-file "~/.emacs.d/emacs-custom.el")
+(load custom-file)
+
 (use-package which-key
   :diminish
   :config
@@ -125,10 +128,15 @@
 (add-hook 'lisp-mode-hook 'disable-tabs)
 (add-hook 'emacs-lisp-mode-hook 'disable-tabs)
 
+(use-package undo-tree
+  :config
+  (global-undo-tree-mode))
+
 (setq evil-want-integration t)
 (setq evil-want-keybinding nil)
 
 (use-package evil
+  :custom ((evil-undo-system 'undo-tree))
   :init
   (setq evil-search-module 'evil-search)
   (setq evil-ex-complete-emacs-commands nil)
@@ -188,6 +196,22 @@
 
 (qqq/leader-keys "'" '(evil-commentary-line :which-key "comment line(s)"))
 
+(require 'dired-x)
+(use-package dired
+    :ensure nil
+    :commands (dired dired-jump)
+    :custom ((dired-dwim-target t))
+    :config
+    (evil-collection-define-key 'normal 'dired-mode-map
+	"h" 'dired-single-up-directory
+	"l" 'dired-single-buffer))
+
+(use-package dired-single)
+
+(use-package all-the-icons-dired
+    :hook (dired-mode . all-the-icons-dired-mode))
+
+(setq qqq/org-directory (list (concat (getenv "SYNCTHING") "org")))
 (use-package org
   :init
   (qqq/leader-keys "a" '(org-agenda :which-key "agenda"))
@@ -203,12 +227,13 @@
   (setq org-hide-emphasis-markers t)
   (setq org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
   (setq org-cycle-separator-lines 1)
-  (setq org-agenda-files (list (concat (getenv "SYNCTHING") "org")))
+  (setq org-directory qqq/org-directory)
+  (setq org-agenda-files qqq/org-directory)
 
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
-     (python . t)))
+	 (python . t)))
 
   (setq org-confirm-babel-evaluate nil)
 
@@ -216,6 +241,15 @@
   (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist '("py" . "src python")))
+
+(use-package org-drill
+  :config
+  (setq org-drill-add-random-noise-to-intervals-p t)
+  (setq org-drill-hint-separator "||")
+  (setq org-drill-left-cloze-delimiter "<[")
+  (setq org-drill-right-cloze-delimiter "]>"))
+
+(use-package org-download)
 
 (with-eval-after-load "ispell"
   (setenv "LANG" "en_US")
@@ -284,10 +318,7 @@
 
   (qqq/leader-keys "t" '(hydra-text-scale/body :which-key "scale text")))
 
-(use-package magit
-  :config
-  (use-package evil-magit
-    :after magit))
+(use-package magit)
 
 (use-package flycheck
   :init (global-flycheck-mode))
