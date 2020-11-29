@@ -450,10 +450,7 @@
   I don't know how I worked with git before this package. This is a
   killer app for sure. Maybe even cooler than org mode.
   #+begin_src emacs-lisp
-    (use-package magit
-      :config
-      (use-package evil-magit
-	:after magit))
+    (use-package magit)
   #+end_src
 
 * Programming
