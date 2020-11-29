@@ -333,7 +333,6 @@
       (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
       (add-to-list 'org-structure-template-alist '("py" . "src python")))
   #+end_src
-
 ** Org Drill
    Flashcards & spaced repetition
    #+begin_src emacs-lisp
@@ -343,6 +342,11 @@
        (setq org-drill-hint-separator "||")
        (setq org-drill-left-cloze-delimiter "<[")
        (setq org-drill-right-cloze-delimiter "]>"))
+   #+end_src
+** Org Download
+   Drop images right into org mode buffer
+   #+begin_src emacs-lisp
+     (use-package org-download)
    #+end_src
 * Spell checking
   I use hunspell for spellchecking, both for en and ru.
