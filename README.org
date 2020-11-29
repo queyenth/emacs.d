@@ -41,6 +41,12 @@
   #+begin_src emacs-lisp
     (add-hook 'text-mode-hook 'turn-on-auto-fill)
   #+end_src
+  Move customizations to another file, cause it makes me mad to see
+  them in init.el
+  #+begin_src emacs-lisp
+    (setq custom-file "~/.emacs.d/emacs-custom.el")
+    (load custom-file)
+  #+end_src
 
 * Some helping stuff
   which-key is a package that shows you the small window with all the
