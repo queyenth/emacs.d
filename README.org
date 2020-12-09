@@ -1,9 +1,6 @@
 #+title: Emacs Configuration
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 
-* Tasks
-** TODO Infix for org stuff (capture, agenda)
-
 * Package manager configuration
   Here we just add some package archives and install use-package.
   #+begin_src emacs-lisp
@@ -49,28 +46,16 @@
   #+end_src
 
 * Some helping stuff
-  which-key is a package that shows you the small window with all the
-  variants of key chord you can do, with either description of that
-  key or its function name
-  #+begin_src emacs-lisp
-    (use-package which-key
-      :diminish
-      :config
-      (which-key-mode))
-  #+end_src
-  Helpful is a better documentation for
-  functions/commands/variables/keys
-  #+begin_src emacs-lisp
-    (use-package helpful
-      :custom
-      (counsel-describe-function-function #'helpful-callable)
-      (counsel-describe-variable-function #'helpful-variable)
-      :bind
-      ([remap describe-function] . counsel-describe-function)
-      ([remap describe-command] . helpful-command)
-      ([remap describe-variable] . counsel-describe-variable)
-      ([remap describe-key] . helpful-key))
-  #+end_src
+** Which-key
+   which-key is a package that shows you the small window with all the
+   variants of key chord you can do, with either description of that
+   key or its function name
+   #+begin_src emacs-lisp
+     (use-package which-key
+       :diminish
+       :config
+       (which-key-mode))
+   #+end_src
 
 * UI
 ** Basic UI settings
@@ -188,12 +173,14 @@
     (add-hook 'lisp-mode-hook 'disable-tabs)
     (add-hook 'emacs-lisp-mode-hook 'disable-tabs)
   #+end_src
+
 * Undo Tree
   #+begin_src emacs-lisp
     (use-package undo-tree
       :config
       (global-undo-tree-mode))
   #+end_src
+
 * Keybindings
 ** Evil
    First of all, let's install evil
@@ -218,7 +205,6 @@
        (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
        ; Backspace is so far away I just can't...
        (evil-define-key 'insert 'global (kbd "C-h") 'evil-delete-backward-char-and-join)
-
        (evil-define-key 'normal 'global (kbd "RET") 'evil-ret-and-indent)
 
        (evil-mode))
@@ -282,20 +268,25 @@
 
 * Dired
   #+begin_src emacs-lisp
-  (require 'dired-x)
-  (use-package dired
-      :ensure nil
-      :commands (dired dired-jump)
-      :custom ((dired-dwim-target t))
-      :config
-      (evil-collection-define-key 'normal 'dired-mode-map
-	  "h" 'dired-single-up-directory
-	  "l" 'dired-single-buffer))
+    (require 'dired-x)
+    (use-package dired
+	:ensure nil
+	:commands (dired dired-jump)
+	:custom ((dired-dwim-target t))
+	:config
+	(evil-collection-define-key 'normal 'dired-mode-map
+	    "h" 'dired-single-up-directory
+	    "l" 'dired-single-buffer))
 
-  (use-package dired-single)
-  
-  (use-package all-the-icons-dired
-      :hook (dired-mode . all-the-icons-dired-mode))
+    (use-package dired-single)
+
+    (use-package all-the-icons-dired
+	:hook (dired-mode . all-the-icons-dired-mode))
+
+     (qqq/leader-keys
+       "d" '(:ignore t :which-key "Dired")
+       "dd" '(dired :which-key "dwim")
+       "do" '(dired-other-window :which-key "other window"))
   #+end_src
 
 * Org Mode
@@ -305,8 +296,6 @@
     (setq qqq/org-directory (list (concat (getenv "SYNCTHING") "org")))
     (use-package org
       :init
-      (qqq/leader-keys "a" '(org-agenda :which-key "agenda"))
-
       (setq org-log-done 'time)
       (setq org-log-into-drawer t)
       (setq org-log-reschedule 'note)
@@ -348,6 +337,14 @@
    #+begin_src emacs-lisp
      (use-package org-download)
    #+end_src
+** Org Keybindings
+   #+begin_src emacs-lisp
+     (qqq/leader-keys
+       "o" '(:ignore t :which-key "Org")
+       "oa" '(org-agenda :which-key "agenda")
+       "od" '(org-drill :which-key "drill"))
+   #+end_src
+
 * Spell checking
   I use hunspell for spellchecking, both for en and ru.
   #+begin_src emacs-lisp
@@ -363,19 +360,6 @@
       (shell-command "touch ~/.emacs.d/.hunspell_personal"))
   #+end_src
 
-* Autocompletion
-  Company is text-completion framework for emacs
-  #+begin_src emacs-lisp
-    (use-package company
-      :custom
-      (company-tooltip-limit 5)
-      (company-idle-delay 0.1)
-      (company-minimum-prefix-length 3)
-      (company-selection-wrap-around t)
-      (company-require-match 'never)
-      :hook (after-init . global-company-mode))
-  #+end_src
-
 * Expand Region
   A small package to expand region of selection, very useful, bind it
   to SPC-=, you can expand more with hitting = or less with -
@@ -384,6 +368,49 @@
       :config
       (qqq/leader-keys "=" '(er/expand-region :which-key "expands region")))
   #+end_src
+  
+* Completion stuff
+** Selectrum
+   I like it. I used Ivy before, but I didn't use a lot of it aside
+   from completion stuff
+   #+begin_src emacs-lisp
+     (use-package selectrum
+       :config
+       (selectrum-mode +1))
+   #+end_src
+*** Prescient
+    Smart sort and filter!
+    #+begin_src emacs-lisp
+      (use-package selectrum-prescient
+	:config
+	(selectrum-prescient-mode +1)
+	(prescient-persist-mode +1))
+    #+end_src
+*** Marginalia
+    Shows cool annotations for completion stuff
+    #+begin_src emacs-lisp
+      (use-package marginalia
+	:config
+	(marginalia-mode))
+    #+end_src
+** Autocompletion
+   Company is text-completion framework for emacs
+   #+begin_src emacs-lisp
+     (use-package company
+       :custom
+       (company-tooltip-limit 5)
+       (company-idle-delay 0.1)
+       (company-minimum-prefix-length 3)
+       (company-selection-wrap-around t)
+       (company-require-match 'never)
+       :hook (after-init . global-company-mode))
+   #+end_src
+
+* Search
+** Ripgrep
+   #+begin_src emacs-lisp
+     (use-package ripgrep)
+   #+end_src
 
 * Projectile
   We use SPC-p as keybinding for access to projectile stuff.
@@ -391,44 +418,10 @@
     (use-package projectile
       :diminish
       :custom
-      ((projectile-completion-system 'ivy))
+      ((projectile-completion-system 'default))
       :config
       (projectile-mode +1)
       (qqq/leader-keys "p" '(projectile-command-map :which-key "projectile")))
-  #+end_src
-
-* Ivy/counsel
-  Ivy is vertical completion mechanism for emacs, a bit too much for
-  my needs, I guess I'll be fine with selectrum, but whatever.
-  #+begin_src emacs-lisp
-    (use-package ivy
-      :diminish
-      :config
-      (ivy-mode 1)
-      (setq ivy-use-virtual-buffers t)
-      (setq ivy-wrap t)
-      (setq enable-recursive-minibuffers t)
-
-      (use-package ivy-rich
-	    :config
-	    (ivy-rich-mode 1)))
-  #+end_src
-
-  Counsel is a collection of Ivy-enhanced versions of common Emacs
-  command (like M-x, ibuffer, find-file)
-  #+begin_src emacs-lisp
-    (use-package counsel
-      :bind (("M-x" . counsel-M-x)
-	     ("C-x b" . counsel-ibuffer)
-	     ("C-x C-f" . counsel-find-file)
-	     :map minibuffer-local-map
-	     ("C-r" . 'counsel-minibuffer-history))
-      :config
-      (setq ivy-initial-inputs-alist nil)
-
-      (use-package counsel-projectile
-	:config
-	(counsel-projectile-mode)))
   #+end_src
 
 * Hydra
@@ -451,6 +444,7 @@
   killer app for sure. Maybe even cooler than org mode.
   #+begin_src emacs-lisp
     (use-package magit)
+    (qqq/leader-keys "g" '(magit-status :which-key "magit"))
   #+end_src
 
 * Programming
@@ -469,10 +463,7 @@
        :commands lsp
        :config
        (use-package lsp-ui
-	 :commands lsp-ui-mode)
-
-       (use-package lsp-ivy
-	 :commands lsp-ivy-workspace-symbol))
+	 :commands lsp-ui-mode))
    #+end_src
 ** Web stuff
    HTML&CSS&JS, you know, all of this.
@@ -492,6 +483,12 @@
      (use-package cider)
    #+end_src
 
+* Misc Stuff
+** WakaTime (hakatime, actually)
+   #+begin_src emacs-lisp
+     (use-package wakatime-mode
+       :init (global-wakatime-mode))
+   #+end_src
 ;; Local Variables:
 ;; eval: (add-hook 'after-save-hook (lambda () (if (y-or-n-p "Reload?")(load-file user-init-file))) nil t)
 ;; eval: (add-hook 'after-save-hook (lambda () (if (y-or-n-p "Tangle?")(org-babel-tangle))) nil t)

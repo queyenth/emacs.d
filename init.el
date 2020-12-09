@@ -35,16 +35,6 @@
   :config
   (which-key-mode))
 
-(use-package helpful
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . counsel-describe-function)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
-
 (setq inhibit-startup-message t)
 (menu-bar-mode -1)
 (when (fboundp 'tool-bar-mode)
@@ -152,7 +142,6 @@
   (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
   ; Backspace is so far away I just can't...
   (evil-define-key 'insert 'global (kbd "C-h") 'evil-delete-backward-char-and-join)
-
   (evil-define-key 'normal 'global (kbd "RET") 'evil-ret-and-indent)
 
   (evil-mode))
@@ -211,11 +200,14 @@
 (use-package all-the-icons-dired
     :hook (dired-mode . all-the-icons-dired-mode))
 
+ (qqq/leader-keys
+   "d" '(:ignore t :which-key "Dired")
+   "dd" '(dired :which-key "dwim")
+   "do" '(dired-other-window :which-key "other window"))
+
 (setq qqq/org-directory (list (concat (getenv "SYNCTHING") "org")))
 (use-package org
   :init
-  (qqq/leader-keys "a" '(org-agenda :which-key "agenda"))
-
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
   (setq org-log-reschedule 'note)
@@ -251,6 +243,11 @@
 
 (use-package org-download)
 
+(qqq/leader-keys
+  "o" '(:ignore t :which-key "Org")
+  "oa" '(org-agenda :which-key "agenda")
+  "od" '(org-drill :which-key "drill"))
+
 (with-eval-after-load "ispell"
   (setenv "LANG" "en_US")
   (setq ispell-program-name "hunspell")
@@ -262,6 +259,23 @@
 (unless (file-exists-p "~/.emacs.d/.hunspell_personal")
   (shell-command "touch ~/.emacs.d/.hunspell_personal"))
 
+(use-package expand-region
+  :config
+  (qqq/leader-keys "=" '(er/expand-region :which-key "expands region")))
+
+(use-package selectrum
+  :config
+  (selectrum-mode +1))
+
+(use-package selectrum-prescient
+  :config
+  (selectrum-prescient-mode +1)
+  (prescient-persist-mode +1))
+
+(use-package marginalia
+  :config
+  (marginalia-mode))
+
 (use-package company
   :custom
   (company-tooltip-limit 5)
@@ -271,42 +285,15 @@
   (company-require-match 'never)
   :hook (after-init . global-company-mode))
 
-(use-package expand-region
-  :config
-  (qqq/leader-keys "=" '(er/expand-region :which-key "expands region")))
+(use-package ripgrep)
 
 (use-package projectile
   :diminish
   :custom
-  ((projectile-completion-system 'ivy))
+  ((projectile-completion-system 'default))
   :config
   (projectile-mode +1)
   (qqq/leader-keys "p" '(projectile-command-map :which-key "projectile")))
-
-(use-package ivy
-  :diminish
-  :config
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-wrap t)
-  (setq enable-recursive-minibuffers t)
-
-  (use-package ivy-rich
-	:config
-	(ivy-rich-mode 1)))
-
-(use-package counsel
-  :bind (("M-x" . counsel-M-x)
-	 ("C-x b" . counsel-ibuffer)
-	 ("C-x C-f" . counsel-find-file)
-	 :map minibuffer-local-map
-	 ("C-r" . 'counsel-minibuffer-history))
-  :config
-  (setq ivy-initial-inputs-alist nil)
-
-  (use-package counsel-projectile
-    :config
-    (counsel-projectile-mode)))
 
 (use-package hydra
   :config
@@ -319,6 +306,7 @@
   (qqq/leader-keys "t" '(hydra-text-scale/body :which-key "scale text")))
 
 (use-package magit)
+(qqq/leader-keys "g" '(magit-status :which-key "magit"))
 
 (use-package flycheck
   :init (global-flycheck-mode))
@@ -328,10 +316,7 @@
   :commands lsp
   :config
   (use-package lsp-ui
-    :commands lsp-ui-mode)
-
-  (use-package lsp-ivy
-    :commands lsp-ivy-workspace-symbol))
+    :commands lsp-ui-mode))
 
 (use-package web-mode)
 
@@ -340,3 +325,6 @@
 
 (use-package clojure-mode)
 (use-package cider)
+
+(use-package wakatime-mode
+  :init (global-wakatime-mode))
