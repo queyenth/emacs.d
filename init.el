@@ -237,6 +237,7 @@
 (use-package org-drill
   :config
   (setq org-drill-add-random-noise-to-intervals-p t)
+  (setq org-drill-learn-fraction 0.25)
   (setq org-drill-hint-separator "||")
   (setq org-drill-left-cloze-delimiter "<[")
   (setq org-drill-right-cloze-delimiter "]>"))
@@ -246,7 +247,8 @@
 (qqq/leader-keys
   "o" '(:ignore t :which-key "Org")
   "oa" '(org-agenda :which-key "agenda")
-  "od" '(org-drill :which-key "drill"))
+  "od" '(org-drill :which-key "drill")
+  "op" '(org-download-clipboard :which-key "clipboard image"))
 
 (with-eval-after-load "ispell"
   (setenv "LANG" "en_US")
