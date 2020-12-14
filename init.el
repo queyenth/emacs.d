@@ -322,6 +322,8 @@
 
 (use-package web-mode)
 
+(use-package vue-mode)
+
 (use-package php-mode
   :hook ((php-mode . lsp)))
 
