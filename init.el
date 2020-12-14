@@ -295,6 +295,7 @@
   ((projectile-completion-system 'default))
   :config
   (projectile-mode +1)
+  (setq projectile-switch-project-action #'magit-status)
   (qqq/leader-keys "p" '(projectile-command-map :which-key "projectile")))
 
 (use-package hydra
