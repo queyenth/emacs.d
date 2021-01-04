@@ -70,8 +70,7 @@
 (use-package linum-relative
   :init
   (setq linum-relative-backend 'display-line-numbers-mode)
-  :config
-  (linum-relative-global-mode))
+  :hook (prog-mode . linum-relative-mode))
 
 (use-package doom-modeline
   :init
