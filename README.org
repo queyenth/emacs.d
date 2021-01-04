@@ -135,6 +135,11 @@
 
      (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
    #+end_src
+** Writeroom
+   Distraction-free writing mode
+   #+begin_src emacs-lisp
+     (use-package writeroom-mode)
+   #+end_src
 ** Misc
    #+begin_src emacs-lisp
      (use-package page-break-lines)

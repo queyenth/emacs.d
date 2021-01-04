@@ -95,6 +95,8 @@
 
 (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
 
+(use-package writeroom-mode)
+
 (use-package page-break-lines)
 (use-package all-the-icons)
 
