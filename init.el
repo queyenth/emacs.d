@@ -42,7 +42,7 @@
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
 (tooltip-mode -1)
-(set-fringe-mode 10)
+(set-fringe-mode 0)
 
 (setq
  x-select-enable-clipboard t
@@ -86,8 +86,8 @@
   (setq dashboard-startup-banner "~/.emacs.d/banner.png")
   (setq dashboard-center-content t)
   (setq dashboard-items '((recents . 5)
-			  (projects . 5)
-			  (agenda . 1)))
+                          (projects . 5)
+                          (agenda . 1)))
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
   :config
@@ -188,23 +188,23 @@
 
 (require 'dired-x)
 (use-package dired
-    :ensure nil
-    :commands (dired dired-jump)
-    :custom ((dired-dwim-target t))
-    :config
-    (evil-collection-define-key 'normal 'dired-mode-map
-	"h" 'dired-single-up-directory
-	"l" 'dired-single-buffer))
+  :ensure nil
+  :commands (dired dired-jump)
+  :custom ((dired-dwim-target t))
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+        "h" 'dired-single-up-directory
+        "l" 'dired-single-buffer))
 
 (use-package dired-single)
 
 (use-package all-the-icons-dired
-    :hook (dired-mode . all-the-icons-dired-mode))
+  :hook (dired-mode . all-the-icons-dired-mode))
 
- (qqq/leader-keys
-   "d" '(:ignore t :which-key "Dired")
-   "dd" '(dired :which-key "dwim")
-   "do" '(dired-other-window :which-key "other window"))
+(qqq/leader-keys
+  "d" '(:ignore t :which-key "Dired")
+  "dd" '(dired :which-key "dwim")
+  "do" '(dired-other-window :which-key "other window"))
 
 (setq qqq/org-directory (list (concat (getenv "SYNCTHING") "org")))
 (use-package org
@@ -229,7 +229,7 @@
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
-	 (python . t)))
+         (python . t)))
 
   (setq org-confirm-babel-evaluate nil)
 
@@ -348,8 +348,8 @@
   (setq mu4e-trash-folder "/[Gmail]/Trash")
 
   (setq mu4e-maildir-shortcuts
-	'(("/Inbox" . ?i)
-	  ("/[Gmail]/Sent Mail" . ?s)
-	  ("/[Gmail]/All Mail" . ?a)
-	  ("/[Gmail]/Trash" . ?t)
-	  ("/[Gmail]/Drafts" . ?d))))
+        '(("/Inbox" . ?i)
+          ("/[Gmail]/Sent Mail" . ?s)
+          ("/[Gmail]/All Mail" . ?a)
+          ("/[Gmail]/Trash" . ?t)
+          ("/[Gmail]/Drafts" . ?d))))
