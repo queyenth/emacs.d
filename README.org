@@ -498,12 +498,6 @@
      (use-package cider)
    #+end_src
 
-* Misc Stuff
-** WakaTime (hakatime, actually)
-   #+begin_src emacs-lisp
-     (use-package wakatime-mode
-       :init (global-wakatime-mode))
-   #+end_src
 ;; Local Variables:
 ;; eval: (add-hook 'after-save-hook (lambda () (if (y-or-n-p "Reload?")(load-file user-init-file))) nil t)
 ;; eval: (add-hook 'after-save-hook (lambda () (if (y-or-n-p "Tangle?")(org-babel-tangle))) nil t)

@@ -335,5 +335,3 @@
 (use-package clojure-mode)
 (use-package cider)
 
-(use-package wakatime-mode
-  :init (global-wakatime-mode))
