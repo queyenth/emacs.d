@@ -3,7 +3,7 @@
 
 * Server Start
   #+begin_src emacs-lisp
-  (server-start)
+    (server-start)
   #+end_src
 
 * Package manager configuration
