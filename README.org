@@ -507,6 +507,8 @@
        (company-minimum-prefix-length 3)
        (company-selection-wrap-around t)
        (company-require-match 'never)
+       :config
+       (add-to-list 'company-backends 'company-capf)
        :hook (after-init . global-company-mode))
    #+end_src
 
