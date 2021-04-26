@@ -544,7 +544,15 @@
 	("k" text-scale-decrease "out")
 	("f" nil "finished" :exit t))
 
-      (qqq/leader-keys "t" '(hydra-text-scale/body :which-key "scale text")))
+      (qqq/leader-keys "t" '(hydra-text-scale/body :which-key "scale text"))
+
+      (defhydra hydra-writeroom-width (:timeout 4)
+        "writeroom width adjustment"
+	("j" writeroom-increase-width "increase")
+	("k" writeroom-decrease-width "decrease")
+	("=" writeroom-adjust-width   "adjust (80)")
+	("f" nil "finished" :exit t))
+      (qqq/leader-keys "w" '(hydra-writeroom-width/body :which-key "writeroom adjustment")))
   #+end_src
 
 * Magit
