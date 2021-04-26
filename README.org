@@ -299,8 +299,12 @@
   guess.
   #+begin_src emacs-lisp
     (setq qqq/org-directory (concat (getenv "SYNCTHING") "org"))
+    (defun qqq/get-org-file (file)
+      (concat qqq/org-directory file))
     (use-package org
-      :init
+      :defer t
+      :commands (org-capture org-agenda)
+      :config
       (setq org-log-done 'time)
       (setq org-log-into-drawer t)
       (setq org-log-reschedule 'note)
@@ -315,7 +319,9 @@
       (setq org-directory qqq/org-directory)
       (setq org-agenda-files (list org-directory))
       (setq org-refile-targets '(org-agenda-files :level . 1))
-      
+      (setq org-todo-keywords
+	'((sequence "TODO" "NEXT" "WAIT" "|" "DONE" "CANCELED")))
+
       (setq org-return-follow-links t)
 
       (org-babel-do-load-languages
@@ -324,12 +330,33 @@
 	     (python . t)))
 
       (setq org-confirm-babel-evaluate nil)
+      (require 'ox-md)
 
       (require 'org-tempo)
       (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
       (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
       (add-to-list 'org-structure-template-alist '("py" . "src python")))
   #+end_src
+** Org Agenda
+   #+begin_src emacs-lisp
+   (use-package org-agenda
+       :ensure nil
+       :after org
+       :config
+       (setq qqq/org-agenda-todo-view
+	 `(("A" "Agenda"
+	   ((agenda ""
+		    ((org-agenda-span 'day)
+		     (org-deadline-warning 365)))
+	    (todo "TODO"
+		    ((org-agenda-overriding-header "To Refile")
+		     (org-agenda-files `(,(qqq/get-org-file "/inbox.org")))))
+	    (todo "NEXT"
+		    ((org-agenda-overriding-header "In Progress")
+		     (org-agenda-files `(,(qqq/get-org-file "/next.org")))))
+	    nil))))
+       (setq org-agenda-custom-commands `,qqq/org-agenda-todo-view))
+   #+end_src
 ** Org Capture
    #+begin_src emacs-lisp
    (with-eval-after-load 'org
@@ -357,6 +384,12 @@
      (use-package org-download
        :after org)
    #+end_src
+** Org Cliplink
+   Paste org-mode link from clipboard
+   #+begin_src emacs-lisp
+   (use-package org-cliplink
+     :after org)
+   #+end_src
 ** Org Roam
    Zettelkasten, PogChamp!
    #+begin_src emacs-lisp
@@ -371,7 +404,8 @@
 	      #'org-roam-capture--get-point
 	      "* %?"
 	      :file-name "daily/%<%Y-%m-%d>"
-	      :head "#+title: %<%Y-%m-%d>\n\n"))))
+	      :head "#+title: %<%Y-%m-%d>\n\n")))
+       (require 'org-roam-protocol))
    #+end_src
 *** Org Roam Server
     #+begin_src emacs-lisp
@@ -400,6 +434,7 @@
     (qqq/leader-keys
 	"o" '(:ignore t :which-key "Org")
 	"oa" '(org-agenda :which-key "agenda")
+	"oc" '(org-capture :which-key "capture")
 	"od" '(org-drill :which-key "drill")
 	"op" '(org-download-clipboard :which-key "clipboard image")
 	"or" '(:ignore t :which-key "Roam")
@@ -411,7 +446,7 @@
 	"ordc" '(org-roam-dailies-capture-today :which-key "capture notes")
 	"ordf" '(org-roam-dailies-find-today :which-key "open today notes"))
    #+end_src
-
+   
 * Spell checking
   I use hunspell for spellchecking, both for en and ru.
   #+begin_src emacs-lisp
