@@ -527,10 +527,10 @@
       ((projectile-completion-system 'default))
       :config
       (projectile-mode +1)
-      (setq projectile-switch-project-action #'magit-status)
+      ;(setq projectile-switch-project-action #'magit-status)
       (qqq/leader-keys "p" '(projectile-command-map :which-key "projectile")))
   #+end_src
-
+  
 * Hydra
   Hydra is some weird thing, I don't know if I really need it, but for
   now we're just using it for text scaling, idk
