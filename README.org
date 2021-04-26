@@ -245,10 +245,6 @@
 	:config
 	(evil-commentary-mode))
     #+end_src
-*** Org Evil
-    #+begin_src emacs-lisp
-      (use-package org-evil)
-    #+end_src
 ** General
    General.el is a package for handling keybindings, creating prefix (leader keys), infix keys, and stuff.
    We're using C-SPC and SPC as leader key for all the stuff we wanna.
@@ -392,8 +388,11 @@
 	  org-roam-server-network-label-wrap-length 20))
     #+end_src
 *** Org Roam Protocol
+** Org Evil
     #+begin_src emacs-lisp
     (require 'org-roam-protocol)
+      (use-package evil-org
+        :after (org evil))
     #+end_src
 ** Org Keybindings
    #+begin_src emacs-lisp
