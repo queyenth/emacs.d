@@ -123,26 +123,10 @@
    #+end_src
 ** Color theme
    #+begin_src emacs-lisp
-     (use-package doom-themes
+     ; Darktooth theme
+     (use-package darktooth-theme
        :config
-       (load-theme 'doom-gruvbox t))
-   #+end_src
-** Dashboard
-   #+begin_src emacs-lisp
-     (use-package dashboard
-       :init
-       (setq dashboard-banner-logo-title "Oh, hello there!")
-       (setq dashboard-startup-banner "~/.emacs.d/banner.png")
-       (setq dashboard-center-content t)
-       (setq dashboard-items '((recents . 5)
-			       (projects . 5)
-			       (agenda . 1)))
-       (setq dashboard-set-heading-icons t)
-       (setq dashboard-set-file-icons t)
-       :config
-       (dashboard-setup-startup-hook))
-
-     (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+       (load-theme 'darktooth t))
    #+end_src
 ** Writeroom
    Distraction-free writing mode
