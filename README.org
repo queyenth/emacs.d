@@ -38,6 +38,7 @@
     (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
     (auto-save-visited-mode)
 
+    (column-number-mode)
   #+end_src
   Turn on auto-fill mode by default for all text-mode
   #+begin_src emacs-lisp
@@ -104,7 +105,6 @@
    #+end_src
 ** Relative line numbers
    #+begin_src emacs-lisp
-     (column-number-mode)
      (use-package linum-relative
        :init
        (setq linum-relative-backend 'display-line-numbers-mode)
