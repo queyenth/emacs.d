@@ -92,7 +92,7 @@
    #+end_src
 ** Font
    #+begin_src emacs-lisp
-     (set-face-attribute 'default nil :font "Fira Mono for Powerline" :height 100)
+     (set-face-attribute 'default nil :font "Go Mono" :height 100)
    #+end_src
 ** Rainbow delimiters
    #+begin_src emacs-lisp
