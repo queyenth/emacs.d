@@ -607,6 +607,10 @@
      (use-package cider
        :commands cider)
    #+end_src
+** Docker
+   #+begin_src emacs-lisp
+     (use-package docker)
+   #+end_src
 
 ;; Local Variables:
 ;; eval: (add-hook 'after-save-hook (lambda () (if (y-or-n-p "Reload?")(load-file user-init-file))) nil t)
