@@ -387,10 +387,8 @@
 	  org-roam-server-network-label-truncate-length 60
 	  org-roam-server-network-label-wrap-length 20))
     #+end_src
-*** Org Roam Protocol
 ** Org Evil
     #+begin_src emacs-lisp
-    (require 'org-roam-protocol)
       (use-package evil-org
         :after (org evil))
     #+end_src
