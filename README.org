@@ -50,6 +50,11 @@
     (setq custom-file "~/.emacs.d/emacs-custom.el")
     (load custom-file)
   #+end_src
+  Some performance stuff
+  #+begin_src emacs-lisp
+    (setq read-process-output-max (* 1024 1024 3))
+    (setq gc-cons-threshold 100000000)
+  #+end_src
 
 * Some helping stuff
 ** Which-key
