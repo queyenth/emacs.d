@@ -24,13 +24,17 @@
 (setq save-place-file (concat user-emacs-directory "places"))
 
 (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
+(auto-save-visited-mode)
 
-(setq auto-save-default nil)
+(column-number-mode)
 
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 
 (setq custom-file "~/.emacs.d/emacs-custom.el")
 (load custom-file)
+
+(setq read-process-output-max (* 1024 1024 3))
+(setq gc-cons-threshold 100000000)
 
 (use-package which-key
   :diminish
@@ -56,7 +60,7 @@
 (setq-default cursor-type 'bar)
 (setq ring-bell-function 'ignore)
 
-(set-face-attribute 'default nil :font "Fira Mono for Powerline" :height 100)
+(set-face-attribute 'default nil :font "Go Mono" :height 100)
 
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
@@ -68,7 +72,6 @@
       (ansi-color-apply-on-region compilation-filter-start (point-max))))
   :hook (compilation-filter . qqq/colorize-compilation-buffer))
 
-(column-number-mode)
 (use-package linum-relative
   :init
   (setq linum-relative-backend 'display-line-numbers-mode)
@@ -78,26 +81,13 @@
   :init
   (doom-modeline-mode 1))
 
-(use-package doom-themes
+; Darktooth theme
+(use-package darktooth-theme
   :config
-  (load-theme 'doom-gruvbox t))
+  (load-theme 'darktooth t))
 
-(use-package dashboard
-  :init
-  (setq dashboard-banner-logo-title "Oh, hello there!")
-  (setq dashboard-startup-banner "~/.emacs.d/banner.png")
-  (setq dashboard-center-content t)
-  (setq dashboard-items '((recents . 5)
-			  (projects . 5)
-			  (agenda . 1)))
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  :config
-  (dashboard-setup-startup-hook))
-
-(setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-
-(use-package writeroom-mode)
+(use-package writeroom-mode
+  :commands writeroom-mode)
 
 (use-package page-break-lines)
 (use-package all-the-icons)
@@ -155,11 +145,13 @@
   (evil-collection-init))
 
 (use-package evil-goggles
+  :after evil
   :config
   (evil-goggles-use-diff-faces)
   (evil-goggles-mode))
 
 (use-package evil-surround
+  :after evil
   :commands
   (evil-surround-edit
    evil-Surround-edit
@@ -172,12 +164,12 @@
   (evil-define-key 'visual global-map "gS" 'evil-Surround-region))
 
 (use-package evil-commentary
+  :after evil
   :config
   (evil-commentary-mode))
 
-(use-package org-evil)
-
 (use-package general
+  :after evil
   :config
   (general-evil-setup t)
 
@@ -190,7 +182,8 @@
     :prefix "SPC m"
     :global-prefix "C-SPC m"))
 
-(qqq/leader-keys "'" '(evil-commentary-line :which-key "comment line(s)"))
+(with-eval-after-load 'general
+  (qqq/leader-keys "'" '(evil-commentary-line :which-key "comment line(s)")))
 
 (require 'dired-x)
 (use-package dired
@@ -202,19 +195,25 @@
     "h" 'dired-single-up-directory
     "l" 'dired-single-buffer))
 
-(use-package dired-single)
+(use-package dired-single
+  :after dired)
 
 (use-package all-the-icons-dired
   :hook (dired-mode . all-the-icons-dired-mode))
 
-(qqq/leader-keys
-  "d" '(:ignore t :which-key "Dired")
-  "dd" '(dired :which-key "dwim")
-  "do" '(dired-other-window :which-key "other window"))
+(with-eval-after-load 'general
+  (qqq/leader-keys
+    "d" '(:ignore t :which-key "Dired")
+    "dd" '(dired :which-key "dwim")
+    "do" '(dired-other-window :which-key "other window")))
 
 (setq qqq/org-directory (concat (getenv "SYNCTHING") "org"))
+(defun qqq/get-org-file (file)
+  (concat qqq/org-directory file))
 (use-package org
-  :init
+  :defer t
+  :commands (org-capture org-agenda)
+  :config
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
   (setq org-log-reschedule 'note)
@@ -229,6 +228,8 @@
   (setq org-directory qqq/org-directory)
   (setq org-agenda-files (list org-directory))
   (setq org-refile-targets '(org-agenda-files :level . 1))
+  (setq org-todo-keywords
+    '((sequence "TODO" "NEXT" "WAIT" "|" "DONE" "CANCELED")))
 
   (setq org-return-follow-links t)
 
@@ -238,19 +239,40 @@
 	 (python . t)))
 
   (setq org-confirm-babel-evaluate nil)
+  (require 'ox-md)
 
   (require 'org-tempo)
   (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist '("py" . "src python")))
 
-(setq org-capture-templates
-    `(("t" "Task" entry (file+headline ,(concat qqq/org-directory "/life.org") "TO DO")
-       (file ,(concat qqq/org-directory "/tmpl/task")))
-       ("b" "Book" entry (file+headline ,(concat qqq/org-directory "/life.org") "Books")
-       (file ,(concat qqq/org-directory "/tmpl/book")))))
+(use-package org-agenda
+    :ensure nil
+    :after org
+    :config
+    (setq qqq/org-agenda-todo-view
+      `(("A" "Agenda"
+	((agenda ""
+		 ((org-agenda-span 'day)
+		  (org-deadline-warning 365)))
+	 (todo "TODO"
+		 ((org-agenda-overriding-header "To Refile")
+		  (org-agenda-files `(,(qqq/get-org-file "/inbox.org")))))
+	 (todo "NEXT"
+		 ((org-agenda-overriding-header "In Progress")
+		  (org-agenda-files `(,(qqq/get-org-file "/next.org")))))
+	 nil))))
+    (setq org-agenda-custom-commands `,qqq/org-agenda-todo-view))
+
+(with-eval-after-load 'org
+  (setq org-capture-templates
+      `(("i" "inbox" entry (file ,(qqq/get-org-file "/inbox.org"))
+  	  (file ,(qqq/get-org-file "/tmpl/task")))
+   	("l" "link" entry (file ,(qqq/get-org-file "/inbox.org"))
+  	  (file ,(qqq/get-org-file "/tmpl/link")) :immediate-finish t))))
 
 (use-package org-drill
+  :after org
   :config
   (setq org-drill-add-random-noise-to-intervals-p t)
   (setq org-drill-learn-fraction 0.25)
@@ -258,10 +280,15 @@
   (setq org-drill-left-cloze-delimiter "<[")
   (setq org-drill-right-cloze-delimiter "]>"))
 
-(use-package org-download)
+(use-package org-download
+  :after org)
+
+(use-package org-cliplink
+  :after org)
 
 (use-package org-roam
     :hook (after-init . org-roam-mode)
+    :defer t
     :init
     (setq org-roam-directory "~/syncthing/data/Default/roam")
     (setq org-roam-dailies-directory "daily/")
@@ -270,9 +297,11 @@
 	   #'org-roam-capture--get-point
 	   "* %?"
 	   :file-name "daily/%<%Y-%m-%d>"
-	   :head "#+title: %<%Y-%m-%d>\n\n"))))
+	   :head "#+title: %<%Y-%m-%d>\n\n")))
+    (require 'org-roam-protocol))
 
 (use-package org-roam-server
+:after org-roam
 :config
 (setq org-roam-server-host "127.0.0.1"
       org-roam-server-port 8080
@@ -286,11 +315,13 @@
       org-roam-server-network-label-truncate-length 60
       org-roam-server-network-label-wrap-length 20))
 
-(require 'org-roam-protocol)
+(use-package evil-org
+  :after (org evil))
 
 (qqq/leader-keys
     "o" '(:ignore t :which-key "Org")
     "oa" '(org-agenda :which-key "agenda")
+    "oc" '(org-capture :which-key "capture")
     "od" '(org-drill :which-key "drill")
     "op" '(org-download-clipboard :which-key "clipboard image")
     "or" '(:ignore t :which-key "Roam")
@@ -314,6 +345,7 @@
   (shell-command "touch ~/.emacs.d/.hunspell_personal"))
 
 (use-package expand-region
+  :commands er/expand-region
   :config
   (qqq/leader-keys "=" '(er/expand-region :which-key "expands region")))
 
@@ -322,6 +354,7 @@
   (selectrum-mode +1))
 
 (use-package selectrum-prescient
+  :after selectrum
   :config
   (selectrum-prescient-mode +1)
   (prescient-persist-mode +1))
@@ -337,6 +370,8 @@
   (company-minimum-prefix-length 3)
   (company-selection-wrap-around t)
   (company-require-match 'never)
+  :config
+  (add-to-list 'company-backends 'company-capf)
   :hook (after-init . global-company-mode))
 
 (use-package ripgrep)
@@ -347,10 +382,11 @@
   ((projectile-completion-system 'default))
   :config
   (projectile-mode +1)
-  (setq projectile-switch-project-action #'magit-status)
+  ;(setq projectile-switch-project-action #'magit-status)
   (qqq/leader-keys "p" '(projectile-command-map :which-key "projectile")))
 
 (use-package hydra
+  :defer t
   :config
   (defhydra hydra-text-scale (:timeout 4)
     "scale text"
@@ -358,20 +394,30 @@
     ("k" text-scale-decrease "out")
     ("f" nil "finished" :exit t))
 
-  (qqq/leader-keys "t" '(hydra-text-scale/body :which-key "scale text")))
+  (qqq/leader-keys "t" '(hydra-text-scale/body :which-key "scale text"))
 
-(use-package magit)
+  (defhydra hydra-writeroom-width (:timeout 4)
+    "writeroom width adjustment"
+    ("j" writeroom-increase-width "increase")
+    ("k" writeroom-decrease-width "decrease")
+    ("=" writeroom-adjust-width   "adjust (80)")
+    ("f" nil "finished" :exit t))
+  (qqq/leader-keys "w" '(hydra-writeroom-width/body :which-key "writeroom adjustment")))
+
+(use-package magit
+  :commands magit-status)
 (qqq/leader-keys "g" '(magit-status :which-key "magit"))
 
 (use-package flycheck
-  :init (global-flycheck-mode))
+  :hook (prog-mode . global-flycheck-mode))
 
 (use-package lsp-mode
   :hook ((lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp
+  :commands lsp lsp-deferred
   :config
   (setq lsp-headerline-breadcrumb-enable nil)
   (use-package lsp-ui
+    :after lsp
     :commands lsp-ui-mode))
 
 (use-package web-mode)
@@ -379,26 +425,10 @@
 (use-package vue-mode)
 
 (use-package php-mode
-  :hook ((php-mode . lsp)))
+  :hook ((php-mode . lsp-deferred)))
 
 (use-package clojure-mode)
-(use-package cider)
+(use-package cider
+  :commands cider)
 
-(use-package mu4e
-  :ensure nil
-  :config
-  (setq mu4e-change-filenames-when-moving t)
-  (setq mu4e-update-interval 600)
-  (setq mu4e-get-mail-command "mbsync -a")
-  (setq mu4e-maildir "~/mail")
-  (setq mu4e-drafts-folder "/[Gmail]/Drafts")
-  (setq mu4e-sent-folder "/[Gmail]/Sent Mail")
-  (setq mu4e-refile-folder "/[Gmail]/All Mail")
-  (setq mu4e-trash-folder "/[Gmail]/Trash")
-
-  (setq mu4e-maildir-shortcuts
-	    '(("/Inbox" . ?i)
-	      ("/[Gmail]/Sent Mail" . ?s)
-	      ("/[Gmail]/All Mail" . ?a)
-	      ("/[Gmail]/Trash" . ?t)
-	      ("/[Gmail]/Drafts" . ?d))))
+(use-package docker)
