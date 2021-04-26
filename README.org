@@ -36,8 +36,8 @@
     (setq save-place-file (concat user-emacs-directory "places"))
 
     (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
+    (auto-save-visited-mode)
 
-    (setq auto-save-default nil)
   #+end_src
   Turn on auto-fill mode by default for all text-mode
   #+begin_src emacs-lisp
