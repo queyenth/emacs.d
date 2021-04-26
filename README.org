@@ -131,7 +131,8 @@
 ** Writeroom
    Distraction-free writing mode
    #+begin_src emacs-lisp
-     (use-package writeroom-mode)
+     (use-package writeroom-mode
+       :commands writeroom-mode)
    #+end_src
 ** Misc
    #+begin_src emacs-lisp
@@ -217,6 +218,7 @@
 *** Evil Goggles
     #+begin_src emacs-lisp
       (use-package evil-goggles
+        :after evil
 	:config
 	(evil-goggles-use-diff-faces)
 	(evil-goggles-mode))
@@ -224,6 +226,7 @@
 *** Evil Surround
     #+begin_src emacs-lisp
       (use-package evil-surround
+        :after evil
 	:commands
 	(evil-surround-edit
 	 evil-Surround-edit
@@ -238,6 +241,7 @@
 *** Evil Commentary
     #+begin_src emacs-lisp
       (use-package evil-commentary
+        :after evil
 	:config
 	(evil-commentary-mode))
     #+end_src
@@ -250,6 +254,7 @@
    We're using C-SPC and SPC as leader key for all the stuff we wanna.
    #+begin_src emacs-lisp
      (use-package general
+       :after evil
        :config
        (general-evil-setup t)
 
@@ -279,7 +284,8 @@
 	"h" 'dired-single-up-directory
 	"l" 'dired-single-buffer))
 
-    (use-package dired-single)
+    (use-package dired-single
+      :after dired)
 
     (use-package all-the-icons-dired
       :hook (dired-mode . all-the-icons-dired-mode))
@@ -338,6 +344,7 @@
    Flashcards & spaced repetition
    #+begin_src emacs-lisp
      (use-package org-drill
+       :after org
        :config
        (setq org-drill-add-random-noise-to-intervals-p t)
        (setq org-drill-learn-fraction 0.25)
@@ -348,13 +355,15 @@
 ** Org Download
    Drop images right into org mode buffer
    #+begin_src emacs-lisp
-     (use-package org-download)
+     (use-package org-download
+       :after org)
    #+end_src
 ** Org Roam
    Zettelkasten, PogChamp!
    #+begin_src emacs-lisp
    (use-package org-roam
        :hook (after-init . org-roam-mode)
+       :defer t
        :init
        (setq org-roam-directory "~/syncthing/data/Default/roam")
        (setq org-roam-dailies-directory "daily/")
@@ -368,6 +377,7 @@
 *** Org Roam Server
     #+begin_src emacs-lisp
     (use-package org-roam-server
+    :after org-roam
     :config
     (setq org-roam-server-host "127.0.0.1"
           org-roam-server-port 8080
@@ -422,6 +432,7 @@
   to SPC-=, you can expand more with hitting = or less with -
   #+begin_src emacs-lisp
     (use-package expand-region
+      :commands er/expand-region
       :config
       (qqq/leader-keys "=" '(er/expand-region :which-key "expands region")))
   #+end_src
@@ -439,6 +450,7 @@
     Smart sort and filter!
     #+begin_src emacs-lisp
       (use-package selectrum-prescient
+        :after selectrum
 	:config
 	(selectrum-prescient-mode +1)
 	(prescient-persist-mode +1))
@@ -487,6 +499,7 @@
   now we're just using it for text scaling, idk
   #+begin_src emacs-lisp
     (use-package hydra
+      :defer t
       :config
       (defhydra hydra-text-scale (:timeout 4)
 	"scale text"
@@ -501,7 +514,8 @@
   I don't know how I worked with git before this package. This is a
   killer app for sure. Maybe even cooler than org mode.
   #+begin_src emacs-lisp
-    (use-package magit)
+    (use-package magit
+      :commands magit-status)
     (qqq/leader-keys "g" '(magit-status :which-key "magit"))
   #+end_src
 
@@ -510,7 +524,7 @@
    Linting and stuff
    #+begin_src emacs-lisp
      (use-package flycheck
-       :init (global-flycheck-mode))
+       :hook (prog-mode . global-flycheck-mode))
    #+end_src
 ** LSP
    Language Server Protocol is cool thing, you don't really need IDE
@@ -518,10 +532,11 @@
    #+begin_src emacs-lisp
      (use-package lsp-mode
        :hook ((lsp-mode . lsp-enable-which-key-integration))
-       :commands lsp
+       :commands lsp lsp-deferred
        :config
        (setq lsp-headerline-breadcrumb-enable nil)
        (use-package lsp-ui
+         :after lsp
 	 :commands lsp-ui-mode))
    #+end_src
 ** Web stuff
@@ -538,13 +553,14 @@
    Yeah, PHP...
    #+begin_src emacs-lisp
      (use-package php-mode
-       :hook ((php-mode . lsp)))
+       :hook ((php-mode . lsp-deferred)))
    #+end_src
 ** Clojure
    The (almost) best language out there
    #+begin_src emacs-lisp
      (use-package clojure-mode)
-     (use-package cider)
+     (use-package cider
+       :commands cider)
    #+end_src
 
 * Mu4e
