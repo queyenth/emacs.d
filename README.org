@@ -265,7 +265,8 @@
    #+end_src
 ** Some evil keybindings
    #+begin_src emacs-lisp
-     (qqq/leader-keys "'" '(evil-commentary-line :which-key "comment line(s)"))
+     (with-eval-after-load 'general
+       (qqq/leader-keys "'" '(evil-commentary-line :which-key "comment line(s)")))
    #+end_src
 
 * Dired
@@ -286,10 +287,11 @@
     (use-package all-the-icons-dired
       :hook (dired-mode . all-the-icons-dired-mode))
 
-    (qqq/leader-keys
-      "d" '(:ignore t :which-key "Dired")
-      "dd" '(dired :which-key "dwim")
-      "do" '(dired-other-window :which-key "other window"))
+    (with-eval-after-load 'general
+      (qqq/leader-keys
+        "d" '(:ignore t :which-key "Dired")
+        "dd" '(dired :which-key "dwim")
+        "do" '(dired-other-window :which-key "other window")))
   #+end_src
 
 * Org Mode
@@ -330,11 +332,12 @@
   #+end_src
 ** Org Capture
    #+begin_src emacs-lisp
-   (setq org-capture-templates
-       `(("t" "Task" entry (file+headline ,(concat qqq/org-directory "/life.org") "TO DO")
-          (file ,(concat qqq/org-directory "/tmpl/task")))
-	  ("b" "Book" entry (file+headline ,(concat qqq/org-directory "/life.org") "Books")
-	  (file ,(concat qqq/org-directory "/tmpl/book")))))
+   (with-eval-after-load 'org
+     (setq org-capture-templates
+         `(("i" "inbox" entry (file ,(qqq/get-org-file "/inbox.org"))
+  	     (file ,(qqq/get-org-file "/tmpl/task")))
+   	   ("l" "link" entry (file ,(qqq/get-org-file "/inbox.org"))
+  	     (file ,(qqq/get-org-file "/tmpl/link")) :immediate-finish t))))
    #+end_src
 ** Org Drill
    Flashcards & spaced repetition
