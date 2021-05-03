@@ -140,6 +140,15 @@
      (use-package all-the-icons)
    #+end_src
 
+* Tree-sitter
+  #+begin_src emacs-lisp
+    (use-package tree-sitter
+      :init
+      (use-package tree-sitter-langs)
+      :config
+      (global-tree-sitter-mode))
+  #+end_src
+   
 * Tabs
   We use 4 spaces for tab
   #+begin_src emacs-lisp

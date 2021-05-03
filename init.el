@@ -92,6 +92,12 @@
 (use-package page-break-lines)
 (use-package all-the-icons)
 
+(use-package tree-sitter
+  :init
+  (use-package tree-sitter-langs)
+  :config
+  (global-tree-sitter-mode))
+
 (setq custom-tab-width 4)
 (setq-default evil-shift-width custom-tab-width)
 (setq-default electric-indent-inhibit t)
