@@ -57,6 +57,10 @@
   #+end_src
 
 * Some helping stuff
+** Diminish
+   #+begin_src emacs-lisp
+     (use-package diminish)
+   #+end_src
 ** Which-key
    which-key is a package that shows you the small window with all the
    variants of key chord you can do, with either description of that
@@ -97,6 +101,7 @@
 ** Rainbow delimiters
    #+begin_src emacs-lisp
      (use-package rainbow-delimiters
+       :diminish
        :hook (prog-mode . rainbow-delimiters-mode))
    #+end_src
 ** Ansi Color for compilation buffer
@@ -184,6 +189,7 @@
 * Undo Tree
   #+begin_src emacs-lisp
     (use-package undo-tree
+      :diminish
       :config
       (global-undo-tree-mode))
   #+end_src
@@ -251,6 +257,7 @@
     #+begin_src emacs-lisp
       (use-package evil-commentary
         :after evil
+	:diminish
 	:config
 	(evil-commentary-mode))
     #+end_src
@@ -404,6 +411,7 @@
    #+begin_src emacs-lisp
    (use-package org-roam
        :hook (after-init . org-roam-mode)
+       :diminish
        :defer t
        :init
        (setq org-roam-directory "~/syncthing/data/Default/roam")
@@ -510,6 +518,7 @@
    Company is text-completion framework for emacs
    #+begin_src emacs-lisp
      (use-package company
+       :diminish
        :custom
        (company-tooltip-limit 5)
        (company-idle-delay 0.1)
@@ -578,6 +587,7 @@
    Linting and stuff
    #+begin_src emacs-lisp
      (use-package flycheck
+       :diminish
        :hook (prog-mode . global-flycheck-mode))
    #+end_src
 ** LSP
@@ -585,6 +595,7 @@
    anymore (I guess)
    #+begin_src emacs-lisp
      (use-package lsp-mode
+       :diminish
        :hook ((lsp-mode . lsp-enable-which-key-integration))
        :commands lsp lsp-deferred
        :config
