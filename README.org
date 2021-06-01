@@ -115,23 +115,16 @@
    #+end_src
 ** Relative line numbers
    #+begin_src emacs-lisp
-     (use-package linum-relative
-       :init
-       (setq linum-relative-backend 'display-line-numbers-mode)
-       :hook (prog-mode . linum-relative-mode))
-   #+end_src
-** Modeline
-   #+begin_src emacs-lisp
-     (use-package doom-modeline
-       :init
-       (doom-modeline-mode 1))
+     (use-package display-line-numbers
+       :ensure nil
+       :custom (display-line-numbers-type 'relative)
+       :hook (prog-mode . display-line-numbers-mode))
    #+end_src
 ** Color theme
    #+begin_src emacs-lisp
-     ; Darktooth theme
-     (use-package darktooth-theme
+     (use-package kaolin-themes
        :config
-       (load-theme 'darktooth t))
+       (load-theme 'kaolin-dark t))
    #+end_src
 ** Writeroom
    Distraction-free writing mode
@@ -158,6 +151,9 @@
   We use 4 spaces for tab
   #+begin_src emacs-lisp
     (setq custom-tab-width 4)
+    (setq tab-width 4)
+    (setq indent-tabs-mode nil)
+    (setq tab-always-indent nil)
     (setq-default evil-shift-width custom-tab-width)
     (setq-default electric-indent-inhibit t)
   #+end_src
@@ -165,25 +161,6 @@
   Delete 4 spaces as tab
   #+begin_src emacs-lisp
     (setq backward-delete-char-untabify-method 'hungry)
-  #+end_src
-
-  Functions to disable and enable tabs
-  #+begin_src emacs-lisp
-    (defun disable-tabs ()
-      "Disable tabs."
-      (setq indent-tabs-mode nil))
-    (defun enable-tabs ()
-      "Enable tabs."
-      (local-set-key (kbd "TAB") 'tab-to-tab-stop)
-      (setq indent-tabs-mode t)
-      (setq tab-width custom-tab-width))
-  #+end_src
-
-  We use tabs for indent for prog-mode, but not for lisp and elisp
-  #+begin_src emacs-lisp
-    (add-hook 'prog-mode-hook 'enable-tabs)
-    (add-hook 'lisp-mode-hook 'disable-tabs)
-    (add-hook 'emacs-lisp-mode-hook 'disable-tabs)
   #+end_src
 
 * Undo Tree
@@ -213,8 +190,8 @@
        ; That doesn't work for some reason Idk
        (setq evil-want-C-u-scroll t)
 
-       ; So we use this :(
        :config
+       ; So we use this :(
        (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
        ; Backspace is so far away I just can't...
        (evil-define-key 'insert 'global (kbd "C-h") 'evil-delete-backward-char-and-join)
@@ -233,7 +210,7 @@
 *** Evil Goggles
     #+begin_src emacs-lisp
       (use-package evil-goggles
-        :after evil
+	:after evil
 	:config
 	(evil-goggles-use-diff-faces)
 	(evil-goggles-mode))
@@ -241,7 +218,7 @@
 *** Evil Surround
     #+begin_src emacs-lisp
       (use-package evil-surround
-        :after evil
+	:after evil
 	:commands
 	(evil-surround-edit
 	 evil-Surround-edit
@@ -256,14 +233,14 @@
 *** Evil Commentary
     #+begin_src emacs-lisp
       (use-package evil-commentary
-        :after evil
+	:after evil
 	:diminish
 	:config
 	(evil-commentary-mode))
     #+end_src
 ** General
    General.el is a package for handling keybindings, creating prefix (leader keys), infix keys, and stuff.
-   We're using C-SPC and SPC as leader key for all the stuff we wanna.
+   We're using C-SPC and SPC as leader key for all the stuff we want.
    #+begin_src emacs-lisp
      (use-package general
        :after evil
@@ -305,9 +282,9 @@
 
     (with-eval-after-load 'general
       (qqq/leader-keys
-        "d" '(:ignore t :which-key "Dired")
-        "dd" '(dired :which-key "dwim")
-        "do" '(dired-other-window :which-key "other window")))
+	"d" '(:ignore t :which-key "Dired")
+	"dd" '(dired :which-key "dwim")
+	"do" '(dired-other-window :which-key "other window")))
   #+end_src
 
 * Org Mode
@@ -336,14 +313,14 @@
       (setq org-agenda-files (list org-directory))
       (setq org-refile-targets '(org-agenda-files :level . 1))
       (setq org-todo-keywords
-	'((sequence "TODO" "NEXT" "WAIT" "|" "DONE" "CANCELED")))
+	    '((sequence "TODO" "NEXT" "WAIT" "|" "DONE" "CANCELED")))
 
       (setq org-return-follow-links t)
 
       (org-babel-do-load-languages
        'org-babel-load-languages
-	   '((emacs-lisp . t)
-	     (python . t)))
+       '((emacs-lisp . t)
+	 (python . t)))
 
       (setq org-confirm-babel-evaluate nil)
       (require 'ox-md)
@@ -355,32 +332,32 @@
   #+end_src
 ** Org Agenda
    #+begin_src emacs-lisp
-   (use-package org-agenda
+     (use-package org-agenda
        :ensure nil
        :after org
        :config
        (setq qqq/org-agenda-todo-view
-	 `(("A" "Agenda"
-	   ((agenda ""
-		    ((org-agenda-span 'day)
-		     (org-deadline-warning 365)))
-	    (todo "TODO"
-		    ((org-agenda-overriding-header "To Refile")
-		     (org-agenda-files `(,(qqq/get-org-file "/inbox.org")))))
-	    (todo "NEXT"
-		    ((org-agenda-overriding-header "In Progress")
-		     (org-agenda-files `(,(qqq/get-org-file "/next.org")))))
-	    nil))))
+	     `(("A" "Agenda"
+		((agenda ""
+			 ((org-agenda-span 'day)
+			  (org-deadline-warning 365)))
+		 (todo "TODO"
+		       ((org-agenda-overriding-header "To Refile")
+			(org-agenda-files `(,(qqq/get-org-file "/inbox.org")))))
+		 (todo "NEXT"
+		       ((org-agenda-overriding-header "In Progress")
+			(org-agenda-files `(,(qqq/get-org-file "/next.org")))))
+		 nil))))
        (setq org-agenda-custom-commands `,qqq/org-agenda-todo-view))
    #+end_src
 ** Org Capture
    #+begin_src emacs-lisp
-   (with-eval-after-load 'org
-     (setq org-capture-templates
-         `(("i" "inbox" entry (file ,(qqq/get-org-file "/inbox.org"))
-  	     (file ,(qqq/get-org-file "/tmpl/task")))
-   	   ("l" "link" entry (file ,(qqq/get-org-file "/inbox.org"))
-  	     (file ,(qqq/get-org-file "/tmpl/link")) :immediate-finish t))))
+     (with-eval-after-load 'org
+       (setq org-capture-templates
+	     `(("i" "inbox" entry (file ,(qqq/get-org-file "/inbox.org"))
+		(file ,(qqq/get-org-file "/tmpl/task")))
+	       ("l" "link" entry (file ,(qqq/get-org-file "/inbox.org"))
+		(file ,(qqq/get-org-file "/tmpl/link")) :immediate-finish t))))
    #+end_src
 ** Org Drill
    Flashcards & spaced repetition
@@ -403,13 +380,13 @@
 ** Org Cliplink
    Paste org-mode link from clipboard
    #+begin_src emacs-lisp
-   (use-package org-cliplink
-     :after org)
+     (use-package org-cliplink
+       :after org)
    #+end_src
 ** Org Roam
    Zettelkasten, PogChamp!
    #+begin_src emacs-lisp
-   (use-package org-roam
+     (use-package org-roam
        :hook (after-init . org-roam-mode)
        :diminish
        :defer t
@@ -417,51 +394,51 @@
        (setq org-roam-directory "~/syncthing/data/Default/roam")
        (setq org-roam-dailies-directory "daily/")
        (setq org-roam-dailies-capture-templates
-           '(("d" "default" entry
-	      #'org-roam-capture--get-point
-	      "* %?"
-	      :file-name "daily/%<%Y-%m-%d>"
-	      :head "#+title: %<%Y-%m-%d>\n\n")))
+	     '(("d" "default" entry
+		#'org-roam-capture--get-point
+		"* %?"
+		:file-name "daily/%<%Y-%m-%d>"
+		:head "#+title: %<%Y-%m-%d>\n\n")))
        (require 'org-roam-protocol))
    #+end_src
 *** Org Roam Server
     #+begin_src emacs-lisp
-    (use-package org-roam-server
-    :after org-roam
-    :config
-    (setq org-roam-server-host "127.0.0.1"
-          org-roam-server-port 8080
-	  org-roam-server-authenticate nil
-	  org-roam-server-export-inline-images t
-	  org-roam-server-server-files nil
-	  org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
-	  org-roam-server-network-poll t
-	  org-roam-server-network-arrows nil
-	  org-roam-server-network-label-truncate t
-	  org-roam-server-network-label-truncate-length 60
-	  org-roam-server-network-label-wrap-length 20))
+      (use-package org-roam-server
+	:after org-roam
+	:config
+	(setq org-roam-server-host "127.0.0.1"
+	      org-roam-server-port 8080
+	      org-roam-server-authenticate nil
+	      org-roam-server-export-inline-images t
+	      org-roam-server-server-files nil
+	      org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
+	      org-roam-server-network-poll t
+	      org-roam-server-network-arrows nil
+	      org-roam-server-network-label-truncate t
+	      org-roam-server-network-label-truncate-length 60
+	      org-roam-server-network-label-wrap-length 20))
     #+end_src
 ** Org Evil
-    #+begin_src emacs-lisp
-      (use-package evil-org
-        :after (org evil))
-    #+end_src
+   #+begin_src emacs-lisp
+     (use-package evil-org
+       :after (org evil))
+   #+end_src
 ** Org Keybindings
    #+begin_src emacs-lisp
-    (qqq/leader-keys
-	"o" '(:ignore t :which-key "Org")
-	"oa" '(org-agenda :which-key "agenda")
-	"oc" '(org-capture :which-key "capture")
-	"od" '(org-drill :which-key "drill")
-	"op" '(org-download-clipboard :which-key "clipboard image")
-	"or" '(:ignore t :which-key "Roam")
-	"ori" '(org-roam-insert :which-key "insert link")
-	"oro" '(org-open-at-point :which-key "open link")
-	"orf" '(org-roam-find-file :which-key "open file")
-	"orb" '(org-roam :which-key "backlinks")
-	"ord" '(:ignore t :which-key "Daily notes")
-	"ordc" '(org-roam-dailies-capture-today :which-key "capture notes")
-	"ordf" '(org-roam-dailies-find-today :which-key "open today notes"))
+     (qqq/leader-keys
+       "o" '(:ignore t :which-key "Org")
+       "oa" '(org-agenda :which-key "agenda")
+       "oc" '(org-capture :which-key "capture")
+       "od" '(org-drill :which-key "drill")
+       "op" '(org-download-clipboard :which-key "clipboard image")
+       "or" '(:ignore t :which-key "Roam")
+       "ori" '(org-roam-insert :which-key "insert link")
+       "oro" '(org-open-at-point :which-key "open link")
+       "orf" '(org-roam-find-file :which-key "open file")
+       "orb" '(org-roam :which-key "backlinks")
+       "ord" '(:ignore t :which-key "Daily notes")
+       "ordc" '(org-roam-dailies-capture-today :which-key "capture notes")
+       "ordf" '(org-roam-dailies-find-today :which-key "open today notes"))
    #+end_src
    
 * Spell checking
@@ -502,7 +479,7 @@
     Smart sort and filter!
     #+begin_src emacs-lisp
       (use-package selectrum-prescient
-        :after selectrum
+	:after selectrum
 	:config
 	(selectrum-prescient-mode +1)
 	(prescient-persist-mode +1))
@@ -545,7 +522,6 @@
       ((projectile-completion-system 'default))
       :config
       (projectile-mode +1)
-      ;(setq projectile-switch-project-action #'magit-status)
       (qqq/leader-keys "p" '(projectile-command-map :which-key "projectile")))
   #+end_src
   
@@ -565,7 +541,7 @@
       (qqq/leader-keys "t" '(hydra-text-scale/body :which-key "scale text"))
 
       (defhydra hydra-writeroom-width (:timeout 4)
-        "writeroom width adjustment"
+	"writeroom width adjustment"
 	("j" writeroom-increase-width "increase")
 	("k" writeroom-decrease-width "decrease")
 	("=" writeroom-adjust-width   "adjust (80)")
@@ -601,7 +577,7 @@
        :config
        (setq lsp-headerline-breadcrumb-enable nil)
        (use-package lsp-ui
-         :after lsp
+	 :after lsp
 	 :commands lsp-ui-mode))
    #+end_src
 ** Web stuff
@@ -631,8 +607,23 @@
    #+begin_src emacs-lisp
      (use-package docker)
    #+end_src
+** Electric Pair Mode
+   #+begin_src emacs-lisp
+     (use-package electric-pair-mode
+       :ensure nil
+       :hook (prog-mode . electric-pair-mode))
+   #+end_src
 
-;; Local Variables:
-;; eval: (add-hook 'after-save-hook (lambda () (if (y-or-n-p "Reload?")(load-file user-init-file))) nil t)
-;; eval: (add-hook 'after-save-hook (lambda () (if (y-or-n-p "Tangle?")(org-babel-tangle))) nil t)
-;; End:
+* FZF
+  What's the point in life if there's no FZF in emacs?
+  #+begin_src emacs-lisp
+    (use-package fzf
+      :init
+      (setenv "FZF_DEFAULT_COMMAND" "fd --type f")
+      (qqq/leader-keys "f" '(fzf-find-file :which-key "FZF")))
+  #+end_src
+
+  ;; Local Variables:
+  ;; eval: (add-hook 'after-save-hook (lambda () (if (y-or-n-p "Reload?")(load-file user-init-file))) nil t)
+  ;; eval: (add-hook 'after-save-hook (lambda () (if (y-or-n-p "Tangle?")(org-babel-tangle))) nil t)
+  ;; End:
