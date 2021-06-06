@@ -516,6 +516,7 @@
   #+begin_src emacs-lisp
     (use-package project
       :config
+      (add-to-list 'project-switch-commands '(magit-status "Magit" ?g))
       (qqq/leader-keys "p" '(:keymap project-prefix-map :which-key "project")))
   #+end_src
 * Find File in Project
