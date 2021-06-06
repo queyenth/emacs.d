@@ -511,18 +511,18 @@
      (use-package ripgrep)
    #+end_src
 
-* Projectile
-  We use SPC-p as keybinding for access to projectile stuff.
+* Project.el
   #+begin_src emacs-lisp
-    (use-package projectile
-      :diminish
-      :custom
-      ((projectile-completion-system 'default))
+    (use-package project
       :config
-      (projectile-mode +1)
-      (qqq/leader-keys "p" '(projectile-command-map :which-key "projectile")))
+      (qqq/leader-keys "p" '(:keymap project-prefix-map :which-key "project")))
   #+end_src
-  
+* Find File in Project
+  #+begin_src emacs-lisp
+    (use-package find-file-in-project
+      :config
+      (setq ffip-use-rust-fd t))
+  #+end_src
 * Hydra
   Hydra is some weird thing, I don't know if I really need it, but for
   now we're just using it for text scaling, idk
