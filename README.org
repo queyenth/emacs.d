@@ -378,12 +378,13 @@
 ** Org Roam
    Zettelkasten, PogChamp!
    #+begin_src emacs-lisp
+     (setq qqq/org-roam-directory (concat (getenv "SYNCTHING") "roam"))
      (use-package org-roam
        :hook (after-init . org-roam-mode)
        :diminish
        :defer t
        :init
-       (setq org-roam-directory "~/syncthing/data/Default/roam")
+       (setq org-roam-directory qqq/org-roam-directory)
        (setq org-roam-dailies-directory "daily/")
        (setq org-roam-dailies-capture-templates
 	     '(("d" "default" entry
