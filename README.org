@@ -203,17 +203,10 @@
 *** Evil Collection
     #+begin_src emacs-lisp
       (use-package evil-collection
+	:diminish
 	:after evil
 	:config
 	(evil-collection-init))
-    #+end_src
-*** Evil Goggles
-    #+begin_src emacs-lisp
-      (use-package evil-goggles
-	:after evil
-	:config
-	(evil-goggles-use-diff-faces)
-	(evil-goggles-mode))
     #+end_src
 *** Evil Surround
     #+begin_src emacs-lisp
