@@ -291,7 +291,6 @@
       :defer t
       :commands (org-capture org-agenda)
       :config
-      (setq org-log-done 'time)
       (setq org-log-into-drawer t)
       (setq org-log-reschedule 'note)
       (setq org-refile-allow-creating-parent-nodes 'confirm)
@@ -306,7 +305,7 @@
       (setq org-agenda-files (list org-directory))
       (setq org-refile-targets '(org-agenda-files :level . 1))
       (setq org-todo-keywords
-	    '((sequence "TODO" "NEXT" "WAIT" "|" "DONE" "CANCELED")))
+	    '((sequence "TODO(t)" "NEXT(n)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
 
       (setq org-return-follow-links t)
 
