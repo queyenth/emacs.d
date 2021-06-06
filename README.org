@@ -414,7 +414,12 @@
 ** Org Evil
    #+begin_src emacs-lisp
      (use-package evil-org
-       :after (org evil))
+       :diminish
+       :after (org evil)
+       :hook (org-mode . evil-org-mode)
+       :config
+       (require 'evil-org-agenda)
+       (evil-org-agenda-set-keys))
    #+end_src
 ** Org Keybindings
    #+begin_src emacs-lisp
