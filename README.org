@@ -509,7 +509,8 @@
 * Search
 ** Ripgrep
    #+begin_src emacs-lisp
-     (use-package ripgrep)
+     (use-package rg)
+     (define-key project-prefix-map "s" #'rg-project)
    #+end_src
 
 * Project.el
