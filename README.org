@@ -332,13 +332,14 @@
 	     `(("A" "Agenda"
 		((agenda ""
 			 ((org-agenda-span 'day)
-			  (org-deadline-warning 365)))
+			  (org-deadline-warning-days 365)))
 		 (todo "TODO"
 		       ((org-agenda-overriding-header "To Refile")
 			(org-agenda-files `(,(qqq/get-org-file "/inbox.org")))))
 		 (todo "NEXT"
 		       ((org-agenda-overriding-header "In Progress")
-			(org-agenda-files `(,(qqq/get-org-file "/next.org")))))
+			(org-agenda-files `(,(qqq/get-org-file "/next.org")
+					    ,(qqq/get-org-file "/projects.org")))))
 		 nil))))
        (setq org-agenda-custom-commands `,qqq/org-agenda-todo-view))
    #+end_src
