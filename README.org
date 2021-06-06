@@ -505,19 +505,10 @@
        (add-to-list 'company-backends 'company-capf)
        :hook (after-init . global-company-mode))
    #+end_src
-
-* Search
-** Ripgrep
-   #+begin_src emacs-lisp
-     (use-package rg)
-     (define-key project-prefix-map "s" #'rg-project)
-   #+end_src
-
 * Project.el
   #+begin_src emacs-lisp
     (use-package project
       :config
-      (add-to-list 'project-switch-commands '(magit-status "Magit" ?g))
       (qqq/leader-keys "p" '(:keymap project-prefix-map :which-key "project")))
   #+end_src
 * Find File in Project
@@ -526,6 +517,12 @@
       :config
       (setq ffip-use-rust-fd t))
   #+end_src
+* Search
+** Ripgrep
+   #+begin_src emacs-lisp
+     (use-package rg)
+     (define-key project-prefix-map "s" #'rg-project)
+   #+end_src
 * Hydra
   Hydra is some weird thing, I don't know if I really need it, but for
   now we're just using it for text scaling, idk
