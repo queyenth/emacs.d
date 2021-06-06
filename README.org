@@ -622,6 +622,11 @@
       :init
       (setenv "FZF_DEFAULT_COMMAND" "fd --type f")
       (qqq/leader-keys "f" '(fzf-find-file :which-key "FZF")))
+
+    (defun project-fzf (project)
+      (interactive (list (project-current t)))
+      (fzf-find-file-in-dir (project-root project)))
+    (define-key project-prefix-map "z" #'project-fzf)
   #+end_src
 
   ;; Local Variables:
