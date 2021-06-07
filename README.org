@@ -310,16 +310,17 @@
       (setq org-refile-targets '(("next.org" :level . 0)
                                  ("projects.org" :maxlevel . 1)))
       (setq org-todo-keywords
-	    '((sequence "TODO(t)" "NEXT(n)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
+            '((sequence "TODO(t)" "NEXT(n)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
 
       (setq org-return-follow-links t)
 
       (org-babel-do-load-languages
        'org-babel-load-languages
        '((emacs-lisp . t)
-	 (python . t)))
+         (python . t)))
 
       (setq org-confirm-babel-evaluate nil)
+      (setq org-src-tab-acts-natively t)
       (require 'ox-md)
 
       (require 'org-tempo)
