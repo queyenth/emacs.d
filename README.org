@@ -104,6 +104,10 @@
        :diminish
        :hook (prog-mode . rainbow-delimiters-mode))
    #+end_src
+** Show paren
+   #+begin_src emacs-lisp
+     (show-paren-mode 1)
+   #+end_src
 ** Ansi Color for compilation buffer
    #+begin_src emacs-lisp
      (use-package ansi-color
@@ -153,7 +157,7 @@
     (setq custom-tab-width 4)
     (setq tab-width 4)
     (setq indent-tabs-mode nil)
-    (setq tab-always-indent nil)
+    (setq tab-always-indent t)
     (setq-default evil-shift-width custom-tab-width)
     (setq-default electric-indent-inhibit t)
   #+end_src
@@ -203,17 +207,10 @@
 *** Evil Collection
     #+begin_src emacs-lisp
       (use-package evil-collection
+	:diminish
 	:after evil
 	:config
 	(evil-collection-init))
-    #+end_src
-*** Evil Goggles
-    #+begin_src emacs-lisp
-      (use-package evil-goggles
-	:after evil
-	:config
-	(evil-goggles-use-diff-faces)
-	(evil-goggles-mode))
     #+end_src
 *** Evil Surround
     #+begin_src emacs-lisp
@@ -298,7 +295,6 @@
       :defer t
       :commands (org-capture org-agenda)
       :config
-      (setq org-log-done 'time)
       (setq org-log-into-drawer t)
       (setq org-log-reschedule 'note)
       (setq org-refile-allow-creating-parent-nodes 'confirm)
@@ -311,18 +307,20 @@
       (setq org-startup-with-inline-images t)
       (setq org-directory qqq/org-directory)
       (setq org-agenda-files (list org-directory))
-      (setq org-refile-targets '(org-agenda-files :level . 1))
+      (setq org-refile-targets '(("next.org" :level . 0)
+                                 ("projects.org" :maxlevel . 1)))
       (setq org-todo-keywords
-	    '((sequence "TODO" "NEXT" "WAIT" "|" "DONE" "CANCELED")))
+            '((sequence "TODO(t)" "NEXT(n)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
 
       (setq org-return-follow-links t)
 
       (org-babel-do-load-languages
        'org-babel-load-languages
        '((emacs-lisp . t)
-	 (python . t)))
+         (python . t)))
 
       (setq org-confirm-babel-evaluate nil)
+      (setq org-src-tab-acts-natively t)
       (require 'ox-md)
 
       (require 'org-tempo)
@@ -340,13 +338,14 @@
 	     `(("A" "Agenda"
 		((agenda ""
 			 ((org-agenda-span 'day)
-			  (org-deadline-warning 365)))
+			  (org-deadline-warning-days 365)))
 		 (todo "TODO"
 		       ((org-agenda-overriding-header "To Refile")
 			(org-agenda-files `(,(qqq/get-org-file "/inbox.org")))))
 		 (todo "NEXT"
 		       ((org-agenda-overriding-header "In Progress")
-			(org-agenda-files `(,(qqq/get-org-file "/next.org")))))
+			(org-agenda-files `(,(qqq/get-org-file "/next.org")
+					    ,(qqq/get-org-file "/projects.org")))))
 		 nil))))
        (setq org-agenda-custom-commands `,qqq/org-agenda-todo-view))
    #+end_src
@@ -386,12 +385,13 @@
 ** Org Roam
    Zettelkasten, PogChamp!
    #+begin_src emacs-lisp
+     (setq qqq/org-roam-directory (concat (getenv "SYNCTHING") "roam"))
      (use-package org-roam
        :hook (after-init . org-roam-mode)
        :diminish
        :defer t
        :init
-       (setq org-roam-directory "~/syncthing/data/Default/roam")
+       (setq org-roam-directory qqq/org-roam-directory)
        (setq org-roam-dailies-directory "daily/")
        (setq org-roam-dailies-capture-templates
 	     '(("d" "default" entry
@@ -421,7 +421,12 @@
 ** Org Evil
    #+begin_src emacs-lisp
      (use-package evil-org
-       :after (org evil))
+       :diminish
+       :after (org evil)
+       :hook (org-mode . evil-org-mode)
+       :config
+       (require 'evil-org-agenda)
+       (evil-org-agenda-set-keys))
    #+end_src
 ** Org Keybindings
    #+begin_src emacs-lisp
@@ -506,25 +511,24 @@
        (add-to-list 'company-backends 'company-capf)
        :hook (after-init . global-company-mode))
    #+end_src
-
+* Project.el
+  #+begin_src emacs-lisp
+    (use-package project
+      :config
+      (qqq/leader-keys "p" '(:keymap project-prefix-map :which-key "project")))
+  #+end_src
+* Find File in Project
+  #+begin_src emacs-lisp
+    (use-package find-file-in-project
+      :config
+      (setq ffip-use-rust-fd t))
+  #+end_src
 * Search
 ** Ripgrep
    #+begin_src emacs-lisp
-     (use-package ripgrep)
+     (use-package rg)
+     (define-key project-prefix-map "s" #'rg-project)
    #+end_src
-
-* Projectile
-  We use SPC-p as keybinding for access to projectile stuff.
-  #+begin_src emacs-lisp
-    (use-package projectile
-      :diminish
-      :custom
-      ((projectile-completion-system 'default))
-      :config
-      (projectile-mode +1)
-      (qqq/leader-keys "p" '(projectile-command-map :which-key "projectile")))
-  #+end_src
-  
 * Hydra
   Hydra is some weird thing, I don't know if I really need it, but for
   now we're just using it for text scaling, idk
@@ -621,6 +625,11 @@
       :init
       (setenv "FZF_DEFAULT_COMMAND" "fd --type f")
       (qqq/leader-keys "f" '(fzf-find-file :which-key "FZF")))
+
+    (defun project-fzf (project)
+      (interactive (list (project-current t)))
+      (fzf-find-file-in-dir (project-root project)))
+    (define-key project-prefix-map "z" #'project-fzf)
   #+end_src
 
   ;; Local Variables:
