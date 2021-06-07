@@ -307,7 +307,8 @@
       (setq org-startup-with-inline-images t)
       (setq org-directory qqq/org-directory)
       (setq org-agenda-files (list org-directory))
-      (setq org-refile-targets '((org-agenda-files . (:level . 1))))
+      (setq org-refile-targets '(("next.org" :level . 0)
+                                 ("projects.org" :maxlevel . 1)))
       (setq org-todo-keywords
 	    '((sequence "TODO(t)" "NEXT(n)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
 
