@@ -104,6 +104,10 @@
        :diminish
        :hook (prog-mode . rainbow-delimiters-mode))
    #+end_src
+** Show paren
+   #+begin_src emacs-lisp
+     (show-paren-mode 1)
+   #+end_src
 ** Ansi Color for compilation buffer
    #+begin_src emacs-lisp
      (use-package ansi-color
