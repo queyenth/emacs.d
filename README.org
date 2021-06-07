@@ -153,7 +153,7 @@
     (setq custom-tab-width 4)
     (setq tab-width 4)
     (setq indent-tabs-mode nil)
-    (setq tab-always-indent nil)
+    (setq tab-always-indent t)
     (setq-default evil-shift-width custom-tab-width)
     (setq-default electric-indent-inhibit t)
   #+end_src
