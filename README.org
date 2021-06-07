@@ -122,9 +122,9 @@
    #+end_src
 ** Color theme
    #+begin_src emacs-lisp
-     (use-package kaolin-themes
+     (use-package base16-theme
        :config
-       (load-theme 'kaolin-dark t))
+       (load-theme 'base16-gruvbox-light-medium t))
    #+end_src
 ** Writeroom
    Distraction-free writing mode
