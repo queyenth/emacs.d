@@ -347,7 +347,12 @@
 			(org-agenda-files `(,(qqq/get-org-file "/next.org")
 					    ,(qqq/get-org-file "/projects.org")))))
 		 nil))))
-       (setq org-agenda-custom-commands `,qqq/org-agenda-todo-view))
+       (setq org-agenda-custom-commands `,qqq/org-agenda-todo-view)
+
+       ; Save all org buffers after refiling
+       (advice-add 'org-refile :after
+                   (lambda (&rest _)
+                     (org-save-all-org-buffers))))
    #+end_src
 ** Org Capture
    #+begin_src emacs-lisp
