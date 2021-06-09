@@ -429,7 +429,7 @@
        :diminish
        :after (org evil)
        :hook (org-mode . evil-org-mode)
-       :config
+       :init
        (require 'evil-org-agenda)
        (evil-org-agenda-set-keys))
    #+end_src
