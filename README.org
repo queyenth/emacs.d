@@ -308,9 +308,10 @@
       (setq org-directory qqq/org-directory)
       (setq org-agenda-files (list org-directory))
       (setq org-refile-targets '(("next.org" :level . 0)
-                                 ("projects.org" :maxlevel . 1)))
+                                 ("projects.org" :maxlevel . 1)
+                                 ("life.org" :level . 0)))
       (setq org-todo-keywords
-            '((sequence "TODO(t)" "NEXT(n)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
+	    '((sequence "TODO(t)" "NEXT(n)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
 
       (setq org-return-follow-links t)
 
@@ -441,6 +442,7 @@
        "oc" '(org-capture :which-key "capture")
        "od" '(org-drill :which-key "drill")
        "op" '(org-download-clipboard :which-key "clipboard image")
+       "os" '(org-save-all-org-buffers :which-key "save all org buffers")
        "or" '(:ignore t :which-key "Roam")
        "ori" '(org-roam-insert :which-key "insert link")
        "oro" '(org-open-at-point :which-key "open link")
