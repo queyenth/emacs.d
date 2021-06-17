@@ -1,11 +1,6 @@
 #+title: Emacs Configuration
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 
-* Server Start
-  #+begin_src emacs-lisp
-    (server-start)
-  #+end_src
-
 * Package manager configuration
   Here we just add some package archives and install use-package.
   #+begin_src emacs-lisp
@@ -96,7 +91,8 @@
    #+end_src
 ** Font
    #+begin_src emacs-lisp
-     (set-face-attribute 'default nil :font "Go Mono" :height 100)
+     (add-hook 'after-make-frame-functions
+	       (lambda (_ &rest) (set-face-attribute 'default nil :font "Go Mono" :height 100)))
    #+end_src
 ** Rainbow delimiters
    #+begin_src emacs-lisp
@@ -638,8 +634,18 @@
       (fzf-find-file-in-dir (project-root project)))
     (define-key project-prefix-map "z" #'project-fzf)
   #+end_src
+* Deft
+  #+begin_src emacs-lisp
+    (use-package deft
+      :commands (deft)
+      :config
+      (setq deft-directory qqq/org-roam-directory)
+      (setq deft-recursive t)
+      (with-eval-after-load 'general
+	(qqq/leader-keys "s" '(deft :which-key "deft"))))
+  #+end_src
 
-  ;; Local Variables:
-  ;; eval: (add-hook 'after-save-hook (lambda () (if (y-or-n-p "Reload?")(load-file user-init-file))) nil t)
-  ;; eval: (add-hook 'after-save-hook (lambda () (if (y-or-n-p "Tangle?")(org-babel-tangle))) nil t)
-  ;; End:
+;; Local Variables:
+;; eval: (add-hook 'after-save-hook (lambda () (if (y-or-n-p "Reload?")(load-file user-init-file))) nil t)
+;; eval: (add-hook 'after-save-hook (lambda () (if (y-or-n-p "Tangle?")(org-babel-tangle))) nil t)
+;; End:
