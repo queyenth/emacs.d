@@ -650,6 +650,14 @@
        (marginalia-mode))
    #+end_src
 
+* Embark
+  #+begin_src emacs-lisp
+    (progn
+      (q/ensure-package 'embark)
+      (global-set-key (kbd "C-.") 'embark-act)
+      (global-set-key (kbd "M-,") 'embark-dwim))
+  #+end_src
+
 * Company
   #+begin_src emacs-lisp
     (progn

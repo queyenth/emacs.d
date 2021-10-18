@@ -388,6 +388,11 @@
   (marginalia-mode))
 
 (progn
+  (q/ensure-package 'embark)
+  (global-set-key (kbd "C-.") 'embark-act)
+  (global-set-key (kbd "M-,") 'embark-dwim))
+
+(progn
   (q/ensure-package 'company)
   (require 'company)
   (setq company-tooltip-limit 5)
