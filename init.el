@@ -366,15 +366,21 @@
   (q/leader-keys "=" '(er/expand-region :which-key "expand region")))
 
 (progn
-  (q/ensure-package 'selectrum)
-  (require 'selectrum)
-  (selectrum-mode +1))
+  (q/ensure-package 'vertico)
+  (require 'vertico)
+  (vertico-mode)
+  (setq vertico-cycle t))
 
 (progn
-  (q/ensure-package 'selectrum-prescient)
-  (with-eval-after-load 'selectrum
-    (selectrum-prescient-mode +1)
-    (prescient-persist-mode +1)))
+  (q/ensure-package 'orderless)
+  (require 'orderless)
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
+
+(setq read-file-name-completion-ignore-case t
+      read-buffer-completion-ignore-case t
+      completion-ignore-case t)
 
 (progn
   (q/ensure-package 'marginalia)
