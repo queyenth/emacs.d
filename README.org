@@ -126,6 +126,21 @@
     (blink-cursor-mode 0)
   #+end_src
 
+* Password management and pinentry
+  Don't forget to put =allow-emacs-pinentry= to =~/.gnupg/gpg-agent.conf=
+  #+begin_src emacs-lisp
+    (progn
+      (q/ensure-package 'pinentry)
+      (require 'pinentry)
+      (pinentry-start))
+  #+end_src
+  Pass is good. Pass is love.
+  #+begin_src emacs-lisp
+    (progn
+      (q/ensure-package 'password-store)
+      (require 'password-store))
+  #+end_src
+
 * Minions
   Basically, it hides all the minor modes in modeline, and adds a =;-=
   which has all of them! Cute!

@@ -65,6 +65,15 @@
 (blink-cursor-mode 0)
 
 (progn
+  (q/ensure-package 'pinentry)
+  (require 'pinentry)
+  (pinentry-start))
+
+(progn
+  (q/ensure-package 'password-store)
+  (require 'password-store))
+
+(progn
   (q/ensure-package 'minions)
   (require 'minions)
   (minions-mode 1))
