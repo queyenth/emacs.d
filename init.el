@@ -205,6 +205,7 @@
 
 (setq calendar-latitude 54.99244)
 (setq calendar-longitude 73.36859)
+(setq calendar-week-start-day 1)
 
 (defun q/last-day-of-week-of-month-p (date day-of-week)
   (let ((today-of-week (calendar-day-of-week date))
