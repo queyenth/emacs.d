@@ -409,6 +409,19 @@
   (q/leader-keys "p" '(:keymap project-prefix-map :which-key "project")))
 
 (progn
+  (q/ensure-package 'popper)
+  (require 'popper)
+  (global-set-key (kbd "C-`") 'popper-toggle-latest)
+  (global-set-key (kbd "M-`") 'popper-cycle)
+  (setq popper-reference-buffers
+        '(help-mode
+          compilation-mode
+          "\\*docker"))
+  (setq popper-group-function #'popper-group-by-project)
+  (popper-mode +1)
+  (popper-echo-mode +1))
+
+(progn
   (q/ensure-package 'find-file-in-project)
   (require 'find-file-in-project)
   (setq ffip-use-rust-fd t))
