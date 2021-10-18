@@ -428,6 +428,7 @@
       (setq org-log-reschedule 'note)
       (setq org-refile-allow-creating-parent-nodes 'confirm)
       (setq org-refile-use-outline-path 'file)
+      (setq org-outline-path-complete-in-steps nil)
       (setq org-indent-indentation-per-level 1)
       (setq org-hide-leading-stars t)
       (setq org-hide-emphasis-markers t)
