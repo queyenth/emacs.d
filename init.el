@@ -527,4 +527,34 @@
   (require 'php-mode)
   (add-hook 'php-mode-hook #'lsp-deferred))
 
+(defun q/magento (command)
+  (interactive (list
+                (read-string "Command: ")))
+  (docker-compose-run-action-with-command "exec" '() "fpm" (concat "php -d memory_limit=4G bin/magento" " " command)))
+
+(defun q/magento-clear-cache ()
+  (interactive)
+  (q/magento "cache:flush"))
+
+(defun q/magento-static-content-deploy (langs)
+  (interactive (list
+                (read-string "Locales: " nil nil "en_US en_GB")))
+  (q/magento (concat "setup:static-content:deploy -f " langs)))
+
+(defun q/magento-di-compile ()
+  (interactive)
+  (q/magento "setup:di:compile"))
+
+(defun q/magento-setup-upgrade ()
+  (interactive)
+  (q/magento "setup:upgrade"))
+
+(q/leader-keys
+  "m" '(:ignore t :which-key "Magento")
+  "mm" '(q/magento :which-key "run some command")
+  "mc" '(q/magento-clear-cache :which-key "clear cache")
+  "ms" '(q/magento-static-content-deploy :which-key "static content deploy")
+  "md" '(q/magento-di-compile :which-key "DI compile")
+  "mu" '(q/magento-setup-upgrade :which-key "setup upgrade"))
+
 (setq nxml-child-indent 4)
