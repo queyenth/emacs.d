@@ -505,6 +505,7 @@
   (q/ensure-package 'lsp-mode)
   (setq lsp-headerline-breadcrumb-enable nil)
   (setq lsp-intelephense-multi-root nil)
+  (setq lsp-file-watch-threshold nil)
   (require 'lsp-mode)
   (with-eval-after-load 'lsp-mode
     (q/ensure-package 'lsp-ui)
