@@ -588,6 +588,10 @@
        (require 'org-toggl)
        (toggl-get-projects)
        (org-toggl-integration-mode))
+
+     (defun q/toggl-get-projects ()
+       (interactive)
+       (toggl-get-projects))
    #+end_src
 
 ** Org Keybindings

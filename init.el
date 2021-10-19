@@ -343,6 +343,10 @@
   (toggl-get-projects)
   (org-toggl-integration-mode))
 
+(defun q/toggl-get-projects ()
+  (interactive)
+  (toggl-get-projects))
+
 (q/leader-keys
   "o" '(:ignore t :which-key "Org")
   "oa" '(org-agenda :which-key "agenda")
