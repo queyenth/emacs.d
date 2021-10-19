@@ -96,7 +96,8 @@
   (defun q/colorize-compilation-buffer ()
     (when (eq major-mode 'compilation-mode)
       (ansi-color-apply-on-region compilation-filter-start (point-max))))
-  (add-hook 'compilation-filter-hook #'q/colorize-compilation-buffer))
+  (add-hook 'compilation-filter-hook #'q/colorize-compilation-buffer)
+  (setq compilation-scroll-output t))
 
 (progn
   (setq display-line-numbers-type t)
