@@ -28,6 +28,8 @@
 (setq custom-file (concat user-emacs-directory "emacs-custom.el"))
 (load custom-file)
 
+(setenv "UID" (string-trim (shell-command-to-string "id -u")))
+
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq create-lockfiles nil)
 (setq-default save-place t)

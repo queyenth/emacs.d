@@ -81,6 +81,11 @@
     (load custom-file)
   #+end_src
 
+* Set UID environment variable
+  #+begin_src emacs-lisp
+    (setenv "UID" (string-trim (shell-command-to-string "id -u")))
+  #+end_src
+
 * Changes of defaults I don't like
   #+begin_src emacs-lisp
     (fset 'yes-or-no-p 'y-or-n-p)
