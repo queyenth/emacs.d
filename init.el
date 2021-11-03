@@ -491,7 +491,12 @@
 
 (progn
   (q/ensure-package 'docker)
-  (require 'docker))
+  (require 'docker)
+  (defun q/force-evil-state-for-docker-compose ()
+    (if (string-match "^\\*docker-compose.*" (buffer-name))
+        (evil-force-normal-state)))
+
+  (add-hook 'shell-mode-hook 'q/force-evil-state-for-docker-compose))
 
 (progn
   (q/ensure-package 'tree-sitter)
