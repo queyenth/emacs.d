@@ -1,8 +1,11 @@
 ;; -*- lexical-binding: t -*-
 
+(setq user-full-name "Queyenth")
+(setq user-mail-address "q@queyenth.xyz")
+
 (setq comp-deferred-compilation t)
 
-(defun q/after-frame (_ &rest)
+(defun q/after-frame (&optional frame)
   (set-face-attribute 'default nil :font "Iosevka" :height 110))
 
 (add-hook 'after-make-frame-functions #'q/after-frame)
@@ -51,6 +54,7 @@
 (savehist-mode)
 (auto-save-visited-mode)
 (global-auto-revert-mode)
+(pixel-scroll-precision-mode)
 
 (add-hook 'text-mode-hook #'turn-on-auto-fill)
 
@@ -74,6 +78,8 @@
 (progn
   (q/ensure-package 'password-store)
   (require 'password-store))
+
+(setq epa-file-encrypt-to user-mail-address)
 
 (progn
   (q/ensure-package 'minions)
@@ -132,7 +138,8 @@
 (progn
   (q/ensure-package 'undo-tree)
   (require 'undo-tree)
-  (global-undo-tree-mode))
+  (global-undo-tree-mode)
+  (setq undo-tree-history-directory-alist `(("." . ,(concat user-emacs-directory "undo-tree")))))
 
 (progn
   (q/ensure-package 'general)
@@ -231,12 +238,14 @@
   (setq org-refile-use-outline-path 'file)
   (setq org-outline-path-complete-in-steps nil)
   (setq org-indent-indentation-per-level 1)
+  (setq org-adapt-indentation t)
   (setq org-hide-leading-stars t)
   (setq org-hide-emphasis-markers t)
   (setq org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
   (setq org-cycle-separator-lines 1)
   (setq org-startup-with-inline-images t)
   (setq org-directory q/org-directory)
+  (add-to-list 'org-modules 'habits)
   (setq org-agenda-files (list org-directory))
   (setq org-refile-targets '(("next.org" :level . 0)
                              ("projects.org" :maxlevel . 1)
@@ -260,6 +269,9 @@
   (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist '("py" . "src python")))
+
+(with-eval-after-load 'org
+  (org-crypt-use-before-save-magic))
 
 (progn
   (setq q/org-agenda-todo-view
@@ -326,6 +338,13 @@
   (require 'org-roam)
   (require 'org-roam-protocol)
   (add-hook 'after-init-hook #'org-roam-setup))
+
+(progn
+  (q/ensure-package 'org-roam-ui)
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start t))
 
 (progn
   (q/ensure-package 'evil-org)
@@ -423,7 +442,7 @@
   (setq popper-reference-buffers
         '(help-mode
           compilation-mode
-          "\\*docker"))
+          "\\* docker"))
   (setq popper-group-function #'popper-group-by-project)
   (popper-mode +1)
   (popper-echo-mode +1))
@@ -493,10 +512,10 @@
   (q/ensure-package 'docker)
   (require 'docker)
   (defun q/force-evil-state-for-docker-compose ()
-    (if (string-match "^\\*docker-compose.*" (buffer-name))
+    (if (string-match "^\\* docker-compose.*" (buffer-name))
         (evil-force-normal-state)))
 
-  (add-hook 'shell-mode-hook 'q/force-evil-state-for-docker-compose))
+  (add-hook 'shell-mode-hook #'q/force-evil-state-for-docker-compose))
 
 (progn
   (q/ensure-package 'tree-sitter)
@@ -524,6 +543,23 @@
   (require 'dap-php))
 
 (progn
+  (q/ensure-package 'yasnippet)
+  (require 'yasnippet)
+  (yas-global-mode 1))
+
+(with-eval-after-load 'yasnippet
+  (q/ensure-package 'yasnippet-snippets))
+
+(q/ensure-package 's)
+
+(defun q/yas-magento-get-namespace-path ()
+  (let* ((file-path (file-name-directory (or (buffer-file-name)
+                                             (buffer-name (current-buffer)))))
+         (namespace (s-replace "/" "\\" (and (string-match ".*/app/code/\\(.*\\)/" file-path)
+                                             (match-string 1 file-path)))))
+    namespace))
+
+(progn
   (q/ensure-package 'web-mode)
   (require 'web-mode))
 
@@ -535,7 +571,7 @@
 (defun q/magento (command)
   (interactive (list
                 (read-string "Command: ")))
-  (docker-compose-run-action-with-command "exec" '() "fpm" (concat "php -d memory_limit=4G bin/magento" " " command)))
+  (docker-compose-run-docker-compose-async-with-buffer "exec" '() "fpm" (concat "php -d memory_limit=4G bin/magento" " " command)))
 
 (defun q/magento-clear-cache ()
   (interactive)
@@ -563,3 +599,8 @@
   "mu" '(q/magento-setup-upgrade :which-key "setup upgrade"))
 
 (setq nxml-child-indent 4)
+
+(progn
+  (q/ensure-package 'typescript-mode)
+  (require 'typescript-mode)
+  (add-hook 'typescript-mode-hook #'lsp-deferred))
