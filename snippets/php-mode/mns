@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: Magento namespace
+# key: mns
+# group: definitions
+# --
+namespace ${1:`(q/yas-magento-get-namespace-path)`};

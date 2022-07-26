@@ -54,9 +54,8 @@
 (savehist-mode)
 (auto-save-visited-mode)
 (global-auto-revert-mode)
+(global-so-long-mode 1)
 (pixel-scroll-precision-mode)
-
-(add-hook 'text-mode-hook #'turn-on-auto-fill)
 
 (setq inhibit-startup-message t)
 (progn
@@ -76,8 +75,8 @@
   (pinentry-start))
 
 (progn
-  (q/ensure-package 'password-store)
-  (require 'password-store))
+  (q/ensure-package 'pass)
+  (require 'pass))
 
 (setq epa-file-encrypt-to user-mail-address)
 
@@ -85,6 +84,11 @@
   (q/ensure-package 'minions)
   (require 'minions)
   (minions-mode 1))
+
+(progn
+  (q/ensure-package 'wc-mode)
+  (require 'wc-mode)
+  (add-to-list 'minions-whitelist '(wc-mode)))
 
 (progn
   (q/ensure-package 'which-key)
@@ -323,29 +327,6 @@
   (with-eval-after-load 'org
     (require 'org-cliplink)))
 
-(setq q/org-roam-directory (concat (getenv "SYNCTHING") "roam"))
-(progn
-  (q/ensure-package 'org-roam)
-  (setq org-roam-directory q/org-roam-directory)
-  (setq org-roam-v2-ack t)
-  (setq org-roam-dailies-directory "daily/")
-  (add-to-list 'display-buffer-alist
-               '(("\\*org-roam\\*"
-                  (display-buffer-in-direction)
-                  (direction . right)
-                  (window-width . 0.33)
-                  (window-height . fit-window-to-buffer))))
-  (require 'org-roam)
-  (require 'org-roam-protocol)
-  (add-hook 'after-init-hook #'org-roam-setup))
-
-(progn
-  (q/ensure-package 'org-roam-ui)
-  (setq org-roam-ui-sync-theme t
-        org-roam-ui-follow t
-        org-roam-ui-update-on-save t
-        org-roam-ui-open-on-start t))
-
 (progn
   (q/ensure-package 'evil-org)
   (with-eval-after-load 'evil
@@ -376,15 +357,7 @@
   "oz" '(org-revert-all-org-buffers :which-key "revert all org buffers")
   "ot" '(:ignore t :which-key "Time Tracking")
   "oti" '(org-clock-in :which-key "clock in")
-  "oto" '(org-clock-out :which-key "clock out")
-  "or" '(:ignore t :which-key "Roam")
-  "ori" '(org-roam-node-insert :which-key "node insert")
-  "orf" '(org-roam-node-find :which-key "node find")
-  "orb" '(org-roam-buffer-toggle :which-key "backlinks")
-  "org" '(org-roam-graph :which-key "graph")
-  "ord" '(:ignore t :which-key "Daily notes")
-  "ordc" '(org-roam-dailies-capture-today :which-key "capture notes")
-  "ordf" '(org-roam-dailies-goto-today :which-key "open today notes"))
+  "oto" '(org-clock-out :which-key "clock out"))
 
 (progn
   (q/ensure-package 'expand-region)
@@ -437,8 +410,8 @@
 (progn
   (q/ensure-package 'popper)
   (require 'popper)
-  (global-set-key (kbd "C-`") 'popper-toggle-latest)
-  (global-set-key (kbd "M-`") 'popper-cycle)
+  (global-set-key (kbd "C-<escape>") 'popper-toggle-latest)
+  (global-set-key (kbd "M-<escape>") 'popper-cycle)
   (setq popper-reference-buffers
         '(help-mode
           compilation-mode
@@ -457,6 +430,8 @@
   (require 'rg)
   (with-eval-after-load 'project
     (define-key project-prefix-map "s" #'rg-project)))
+
+(setq xref-search-program 'ripgrep)
 
 (progn
   (q/ensure-package 'fzf)
@@ -514,6 +489,9 @@
   (defun q/force-evil-state-for-docker-compose ()
     (if (string-match "^\\* docker-compose.*" (buffer-name))
         (evil-force-normal-state)))
+  (defun q/kill-all-exec-buffers ()
+    (interactive)
+    (kill-matching-buffers "\* docker-compose exec" nil t))
 
   (add-hook 'shell-mode-hook #'q/force-evil-state-for-docker-compose))
 
@@ -604,3 +582,23 @@
   (q/ensure-package 'typescript-mode)
   (require 'typescript-mode)
   (add-hook 'typescript-mode-hook #'lsp-deferred))
+
+(setq q/notes-directory (concat q/org-directory "/notes"))
+(progn
+  (q/ensure-package 'denote)
+  (setq denote-directory q/notes-directory)
+  (setq denote-known-keywords '("emacs" "book" "idea" "philosophy"))
+  (setq denote-infer-keywords nil))
+
+(defun q/find-note ()
+  (interactive)
+  (let ((default-directory (concat (string-trim-right denote-directory "/") "/")))
+        (call-interactively 'find-file)))
+
+  (with-eval-after-load 'general
+    (q/leader-keys
+      "n" '(:ignore t :which-key "Denote")
+      "nn" '(denote :which-key "new")
+      "nl" '(denote-link :which-key "link")
+      "nb" '(denote-link-backlinks :which-key "backlinks")
+      "no" '(q/find-note :which-key "find")))

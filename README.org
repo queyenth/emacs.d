@@ -3,8 +3,6 @@
 
 * Stuff to do
 ** TODO Eglot
-** TODO Check =icomplete-vertical=
-** TODO Programming languages
 ** TODO Performance. Defer loading and stuff.
 
 * Lexical binding comment for both early-init and init
@@ -118,9 +116,8 @@
     (savehist-mode)
     (auto-save-visited-mode)
     (global-auto-revert-mode)
+    (global-so-long-mode 1)
     (pixel-scroll-precision-mode)
-
-    (add-hook 'text-mode-hook #'turn-on-auto-fill)
   #+end_src
 
 * Not so amazing default modes I need disabled
@@ -149,8 +146,8 @@
   Pass is good. Pass is love.
   #+begin_src emacs-lisp
     (progn
-      (q/ensure-package 'password-store)
-      (require 'password-store))
+      (q/ensure-package 'pass)
+      (require 'pass))
   #+end_src
 
 * EPA
@@ -167,6 +164,14 @@
       (q/ensure-package 'minions)
       (require 'minions)
       (minions-mode 1))
+  #+end_src
+
+* Word Count Mode
+  #+begin_src emacs-lisp
+    (progn
+      (q/ensure-package 'wc-mode)
+      (require 'wc-mode)
+      (add-to-list 'minions-whitelist '(wc-mode)))
   #+end_src
 
 * Which key
@@ -566,37 +571,6 @@
          (require 'org-cliplink)))
    #+end_src
 
-** Org Roam
-   [[https://en.wikipedia.org/wiki/Zettelkasten][Zetttelkasten]]. There's a lot to say about it, so I won't. It just
-   helps me to improve my reading, to work on my ideas. You can look
-   it up, it's fun.
-   #+begin_src emacs-lisp
-     (setq q/org-roam-directory (concat (getenv "SYNCTHING") "roam"))
-     (progn
-       (q/ensure-package 'org-roam)
-       (setq org-roam-directory q/org-roam-directory)
-       (setq org-roam-v2-ack t)
-       (setq org-roam-dailies-directory "daily/")
-       (add-to-list 'display-buffer-alist
-                    '(("\\*org-roam\\*"
-                       (display-buffer-in-direction)
-                       (direction . right)
-                       (window-width . 0.33)
-                       (window-height . fit-window-to-buffer))))
-       (require 'org-roam)
-       (require 'org-roam-protocol)
-       (add-hook 'after-init-hook #'org-roam-setup))
-   #+end_src
-*** Org Roam UI
-    #+begin_src emacs-lisp
-      (progn
-        (q/ensure-package 'org-roam-ui)
-        (setq org-roam-ui-sync-theme t
-              org-roam-ui-follow t
-              org-roam-ui-update-on-save t
-              org-roam-ui-open-on-start t))
-    #+end_src
-
 ** Evil Org
    Looks like [[*Evil collection][evil-collection]] doesn't have bindings for =org-mode=. So
    here it is.
@@ -638,15 +612,7 @@
        "oz" '(org-revert-all-org-buffers :which-key "revert all org buffers")
        "ot" '(:ignore t :which-key "Time Tracking")
        "oti" '(org-clock-in :which-key "clock in")
-       "oto" '(org-clock-out :which-key "clock out")
-       "or" '(:ignore t :which-key "Roam")
-       "ori" '(org-roam-node-insert :which-key "node insert")
-       "orf" '(org-roam-node-find :which-key "node find")
-       "orb" '(org-roam-buffer-toggle :which-key "backlinks")
-       "org" '(org-roam-graph :which-key "graph")
-       "ord" '(:ignore t :which-key "Daily notes")
-       "ordc" '(org-roam-dailies-capture-today :which-key "capture notes")
-       "ordf" '(org-roam-dailies-goto-today :which-key "open today notes"))
+       "oto" '(org-clock-out :which-key "clock out"))
    #+end_src
 
 * Expand Region
@@ -729,8 +695,8 @@
     (progn
       (q/ensure-package 'popper)
       (require 'popper)
-      (global-set-key (kbd "C-`") 'popper-toggle-latest)
-      (global-set-key (kbd "M-`") 'popper-cycle)
+      (global-set-key (kbd "C-<escape>") 'popper-toggle-latest)
+      (global-set-key (kbd "M-<escape>") 'popper-cycle)
       (setq popper-reference-buffers
             '(help-mode
               compilation-mode
@@ -760,6 +726,11 @@
       (require 'rg)
       (with-eval-after-load 'project
         (define-key project-prefix-map "s" #'rg-project)))
+  #+end_src
+
+  Also use ripgrep for =xref=.
+  #+begin_src emacs-lisp
+    (setq xref-search-program 'ripgrep)
   #+end_src
 
 * FZF
@@ -850,6 +821,9 @@
        (defun q/force-evil-state-for-docker-compose ()
          (if (string-match "^\\* docker-compose.*" (buffer-name))
              (evil-force-normal-state)))
+       (defun q/kill-all-exec-buffers ()
+         (interactive)
+         (kill-matching-buffers "\* docker-compose exec" nil t))
 
        (add-hook 'shell-mode-hook #'q/force-evil-state-for-docker-compose))
    #+end_src
@@ -972,3 +946,27 @@
         (require 'typescript-mode)
         (add-hook 'typescript-mode-hook #'lsp-deferred))
     #+end_src
+
+* Denote
+  Prot is genius.
+  #+begin_src emacs-lisp
+    (setq q/notes-directory (concat q/org-directory "/notes"))
+    (progn
+      (q/ensure-package 'denote)
+      (setq denote-directory q/notes-directory)
+      (setq denote-known-keywords '("emacs" "book" "idea" "philosophy"))
+      (setq denote-infer-keywords nil))
+
+    (defun q/find-note ()
+      (interactive)
+      (let ((default-directory (concat (string-trim-right denote-directory "/") "/")))
+            (call-interactively 'find-file)))
+
+      (with-eval-after-load 'general
+        (q/leader-keys
+          "n" '(:ignore t :which-key "Denote")
+          "nn" '(denote :which-key "new")
+          "nl" '(denote-link :which-key "link")
+          "nb" '(denote-link-backlinks :which-key "backlinks")
+          "no" '(q/find-note :which-key "find")))
+  #+end_src
