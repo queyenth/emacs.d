@@ -532,7 +532,7 @@
      (with-eval-after-load 'org
        (setq org-capture-templates
              `(("i" "inbox" entry (file ,(q/get-org-file "/inbox.org"))
-                (file ,(q/get-org-file "/tmpl/task")) :immediate-finish t)
+                (file ,(q/get-org-file "/tmpl/task")))
                ("l" "link" entry (file ,(q/get-org-file "/inbox.org"))
                 (file ,(q/get-org-file "/tmpl/link")) :immediate-finish t))))
    #+end_src
