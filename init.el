@@ -114,12 +114,9 @@
   (add-hook 'prog-mode-hook #'display-line-numbers-mode))
 
 (progn
-  (q/ensure-package 'doom-themes)
-  (require 'doom-themes)
-  (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t)
-  (load-theme 'doom-one-light t)
-  (doom-themes-org-config))
+  (q/ensure-package 'ef-themes)
+  (mapc #'disable-theme custom-enabled-themes)
+  (load-theme 'ef-day :no-confirm))
 
 (progn
   (q/ensure-package 'writeroom-mode)
