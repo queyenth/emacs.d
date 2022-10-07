@@ -293,6 +293,11 @@
                                        ,(q/get-org-file "/projects.org")))))
             nil))))
   (setq org-agenda-custom-commands `,q/org-agenda-todo-view)
+  (setq org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t%-6e% s")
+                                   (todo . " %i %-12:c %-6e")
+                                   (tags . " %i %-12:c")
+                                   (search . " %i %-12:c")))
+
   (advice-add 'org-refile :after
               (lambda (&rest _)
                 (org-save-all-org-buffers))))
