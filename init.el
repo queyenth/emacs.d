@@ -390,7 +390,13 @@
 
 (progn
   (q/ensure-package 'embark)
+  (defun embark-act-noquit ()
+    "Run action but don't quit the minibuffer afterwards."
+    (interactive)
+    (let ((embark-quit-after-action nil))
+      (embark-act)))
   (global-set-key (kbd "C-.") 'embark-act)
+  (global-set-key (kbd "C-,") 'embark-act-noquit)
   (global-set-key (kbd "M-,") 'embark-dwim))
 
 (progn
