@@ -460,6 +460,7 @@
       (setq org-startup-with-inline-images t)
       (setq org-directory q/org-directory)
       (add-to-list 'org-modules 'habits)
+      (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
       (setq org-agenda-files (list org-directory))
       (setq org-refile-targets '(("next.org" :level . 0)
                                  ("projects.org" :maxlevel . 1)
