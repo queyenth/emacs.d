@@ -1,5 +1,4 @@
 ;; -*- lexical-binding: t -*-
-
 (setq read-process-output-max (* 1024 1024 3))
 (add-hook 'emacs-startup-hook
           (let ((old-threshold gc-cons-threshold))

@@ -3,19 +3,16 @@
 
 * Stuff to do
 ** TODO Eglot
+** TODO Forget about general.el?
+** TODO MEOW mode
+** TODO Maybe I don't need undo-tree anymore?
+** TODO Flymake
+** TODO Remove unused stuff
 ** TODO Performance. Defer loading and stuff.
-
-* Lexical binding comment for both early-init and init
-  I'm too lazy to write some code to tangle to both files.
-  #+begin_src emacs-lisp :tangle ./early-init.el
-    ;; -*- lexical-binding: t -*-
-  #+end_src
-  #+begin_src emacs-lisp
-    ;; -*- lexical-binding: t -*-
-  #+end_src
 
 * Early init
   #+begin_src emacs-lisp :tangle ./early-init.el
+    ;; -*- lexical-binding: t -*-
     (setq read-process-output-max (* 1024 1024 3))
     (add-hook 'emacs-startup-hook
               (let ((old-threshold gc-cons-threshold))
@@ -30,6 +27,7 @@
 
 * User Information
   #+begin_src emacs-lisp
+    ;; -*- lexical-binding: t -*-
     (setq user-full-name "Queyenth")
     (setq user-mail-address "q@queyenth.xyz")
   #+end_src
