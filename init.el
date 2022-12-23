@@ -85,11 +85,6 @@
   (minions-mode 1))
 
 (progn
-  (q/ensure-package 'wc-mode)
-  (require 'wc-mode)
-  (add-to-list 'minions-whitelist '(wc-mode)))
-
-(progn
   (q/ensure-package 'which-key)
   (require 'which-key)
   (which-key-mode))
@@ -116,10 +111,6 @@
   (q/ensure-package 'ef-themes)
   (mapc #'disable-theme custom-enabled-themes)
   (load-theme 'ef-day :no-confirm))
-
-(progn
-  (q/ensure-package 'writeroom-mode)
-  (require 'writeroom-mode))
 
 (progn
   (q/ensure-package 'all-the-icons)
@@ -224,6 +215,14 @@
     (and
      (eq today-of-week day-of-week)
      (not (eq next-week-month month)))))
+
+(setq zoneinfo-style-world-list '(("America/New_York" "New York")
+                                  ("Europe/London" "London")
+                                  ("Europe/Paris" "Paris")
+                                  ("Europe/Moscow" "Moscow")
+                                  ("Asia/Tbilisi" "Tbilisi")
+                                  ("Asia/Omsk" "Omsk")
+                                  ("Asia/Tokyo" "Tokyo")))
 
 (setq q/org-directory (concat (getenv "SYNCTHING") "org"))
 (defun q/get-org-file (file)
@@ -362,11 +361,6 @@
   "oto" '(org-clock-out :which-key "clock out"))
 
 (progn
-  (q/ensure-package 'expand-region)
-  (require 'expand-region)
-  (q/leader-keys "=" '(er/expand-region :which-key "expand region")))
-
-(progn
   (q/ensure-package 'vertico)
   (require 'vertico)
   (vertico-mode)
@@ -375,7 +369,7 @@
 (progn
   (q/ensure-package 'orderless)
   (require 'orderless)
-  (setq completion-styles '(orderless)
+  (setq completion-styles '(orderless basic)
         completion-category-defaults nil
         completion-category-overrides '((file (styles partial-completion)))))
 
@@ -400,19 +394,21 @@
   (global-set-key (kbd "M-,") 'embark-dwim))
 
 (progn
-  (q/ensure-package 'company)
-  (require 'company)
-  (setq company-tooltip-limit 5)
-  (setq company-idle-delay 0.1)
-  (setq company-minimum-prefix-length 3)
-  (setq company-selection-wrap-around t)
-  (setq company-require-match 'never)
-  (add-to-list 'company-backends 'company-capf)
-  (add-hook 'after-init-hook #'global-company-mode))
+  (q/ensure-package 'corfu)
+  (setq completion-cycle-threshold 3)
+  (setq corfu-cycle t)
+  (setq corfu-auto t)
+  (setq corfu-auto-delay 0.1)
+  (setq corfu-auto-prefix 4)
+  (setq corfu-separator ?\s)
+  (setq corfu-preview-current nil)
+  (setq corfu-preselect-first nil)
+  (global-corfu-mode))
 
 (progn
   (q/ensure-package 'project)
   (require 'project)
+  (define-key project-prefix-map "z" (lambda () (interactive) (project-find-file t)))
   (q/leader-keys "p" '(:keymap project-prefix-map :which-key "project")))
 
 (progn
@@ -429,11 +425,6 @@
   (popper-echo-mode +1))
 
 (progn
-  (q/ensure-package 'find-file-in-project)
-  (require 'find-file-in-project)
-  (setq ffip-use-rust-fd t))
-
-(progn
   (q/ensure-package 'rg)
   (require 'rg)
   (with-eval-after-load 'project
@@ -442,31 +433,12 @@
 (setq xref-search-program 'ripgrep)
 
 (progn
-  (q/ensure-package 'fzf)
-  (setenv "FZF_DEFAULT_COMMAND" "fd --type f")
-  (require 'fzf)
-  (q/leader-keys "z" '(fzf-find-file :which-key "FZF find file"))
-  (q/leader-keys "b" '(fzf-switch-buffer :which-key "FZF switch buffer"))
-  (defun fzf-no-ignore ()
-    (interactive)
-    (setenv "FZF_DEFAULT_COMMAND" "fd --no-ignore --type f"))
-  (defun fzf-ignore ()
-    (interactive)
-    (setenv "FZF_DEFAULT_COMMAND" "fd --type f"))
-  (with-eval-after-load 'project
-    (defun project-fzf ()
-      (interactive)
-      (let ((project (project-current t)))
-        (fzf-find-file-in-dir (project-root project))))
-    (define-key project-prefix-map "z" #'project-fzf)))
-
-(progn
   (q/ensure-package 'magit)
   (require 'magit)
   (q/leader-keys "g" '(magit-status :which-key "magit"))
   (with-eval-after-load 'project
-    (define-key project-prefix-map "m" #'magit-status)
-    (add-to-list 'project-switch-commands '(magit-status "Magit"))))
+    (define-key project-prefix-map "m" #'magit-project-status)
+    (add-to-list 'project-switch-commands '(magit-project-status "Magit"))))
 
 (progn
   (q/ensure-package 'magit-todos)
@@ -484,9 +456,12 @@
   (setq elfeed-search-title-min-width 100))
 
 (progn
-  (q/ensure-package 'flycheck)
-  (require 'flycheck)
-  (add-hook 'prog-mode-hook #'global-flycheck-mode))
+  (q/ensure-package 'eglot)
+  (setq eglot-sync-connect nil)
+  (setq eglot-events-buffer-size 0)
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs
+                 '((php-mode phps-mode) . ("intelephense" "--stdio")))))
 
 (progn
   (add-hook 'prog-mode-hook #'electric-pair-mode))
@@ -502,31 +477,6 @@
     (kill-matching-buffers "\* docker-compose exec" nil t))
 
   (add-hook 'shell-mode-hook #'q/force-evil-state-for-docker-compose))
-
-(progn
-  (q/ensure-package 'tree-sitter)
-  (q/ensure-package 'tree-sitter-langs)
-  (require 'tree-sitter)
-  (require 'tree-sitter-langs)
-  (global-tree-sitter-mode)
-  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
-
-(progn
-  (q/ensure-package 'lsp-mode)
-  (setq lsp-headerline-breadcrumb-enable nil)
-  (setq lsp-intelephense-multi-root nil)
-  (setq lsp-file-watch-threshold nil)
-  (require 'lsp-mode)
-  (with-eval-after-load 'lsp-mode
-    (q/ensure-package 'lsp-ui)
-    (require 'lsp-ui))
-  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
-
-(progn
-  (q/ensure-package 'dap-mode)
-  (require 'dap-mode)
-  (dap-auto-configure-mode)
-  (require 'dap-php))
 
 (progn
   (q/ensure-package 'yasnippet)
@@ -552,7 +502,7 @@
 (progn
   (q/ensure-package 'php-mode)
   (require 'php-mode)
-  (add-hook 'php-mode-hook #'lsp-deferred))
+  (add-hook 'php-mode-hook #'eglot-ensure))
 
 (defun q/magento (command)
   (interactive (list
@@ -586,10 +536,7 @@
 
 (setq nxml-child-indent 4)
 
-(progn
-  (q/ensure-package 'typescript-mode)
-  (require 'typescript-mode)
-  (add-hook 'typescript-mode-hook #'lsp-deferred))
+(add-hook 'typescript-ts-mode-hook #'eglot-ensure)
 
 (setq q/notes-directory (concat q/org-directory "/notes"))
 (progn
