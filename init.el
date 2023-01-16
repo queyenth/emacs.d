@@ -5,7 +5,7 @@
 (setq comp-deferred-compilation t)
 
 (defun q/after-frame (&optional frame)
-  (set-face-attribute 'default nil :font "Iosevka" :height 110))
+  (set-face-attribute 'default nil :font "Fira Code" :height 110))
 
 (add-hook 'after-make-frame-functions #'q/after-frame)
 
@@ -110,7 +110,9 @@
 (progn
   (q/ensure-package 'ef-themes)
   (mapc #'disable-theme custom-enabled-themes)
-  (load-theme 'ef-day :no-confirm))
+  (setq ef-themes-to-toggle '(ef-autumn ef-spring))
+  ; By default load the light theme.
+  (load-theme 'ef-spring :no-confirm))
 
 (progn
   (q/ensure-package 'all-the-icons)
@@ -557,3 +559,7 @@
       "nl" '(denote-link :which-key "link")
       "nb" '(denote-link-backlinks :which-key "backlinks")
       "no" '(q/find-note :which-key "find")))
+
+(progn
+  (q/ensure-package 'telega)
+  (setq telega-use-docker 1))
