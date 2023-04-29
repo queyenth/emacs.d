@@ -258,8 +258,9 @@
 
 (progn
   (q/ensure-package 'vertico)
-  (vertico-mode)
-  (setq vertico-cycle t))
+  (keymap-set vertico-map "C-e" #'vertico-previous)
+  (setq vertico-cycle t)
+  (vertico-mode))
 
 (progn
   (q/ensure-package 'orderless)
