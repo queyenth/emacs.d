@@ -614,11 +614,5 @@
   (q/ensure-package 'ace-window)
   (global-set-key (kbd "M-o") 'ace-window))
 
-(progn
-  ; Let's configure windmove
-  (global-set-key (kbd "C-c w h") 'windmove-left)
-  (global-set-key (kbd "C-c w j") 'windmove-down)
-  (global-set-key (kbd "C-c w k") 'windmove-up)
-  (global-set-key (kbd "C-c w l") 'windmove-right))
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
