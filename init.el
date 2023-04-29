@@ -614,5 +614,46 @@
   (q/ensure-package 'ace-window)
   (global-set-key (kbd "M-o") 'ace-window))
 
+(defun q/toLily (line msg)
+  (interactive (list
+                (read-number "Line (0-3): " 0)
+                (read-string "Message: ")))
+  (shell-command (format "toLily %d '%s'" line msg)))
+
+(define-minor-mode lily-keystrokes-mode
+  "Send typed keystrokes to lily58's OLED"
+  :lighter " Lily58"
+  :global t
+  (if lily-keystrokes-mode
+      (add-hook 'pre-command-hook #'lily-keystrokes)
+    (remove-hook 'pre-command-hook #'lily-keystrokes)))
+
+(defun lily-get-last-N (N)
+  (mapcar
+   #'reverse
+   (seq-drop
+    (seq-take
+     (reverse
+      (seq-reduce
+       (lambda (res key)
+         (cond
+          ((and (consp key) (null (car key)))
+           (push (cons (if (symbolp (cdr key)) (cdr key)
+                         "anonymous-command") nil) res))
+          ((or (symbolp key) (integerp key) (listp key))
+           (let ((first (reverse (pop res))))
+             (push (single-key-description key) first)
+             (push (reverse first) res)))))
+       (reverse (recent-keys t))
+       (list ()))) (+ N 1)) 1)))
+
+(defun lily-keystrokes ()
+  (let ((last-cmds (lily-get-last-N 4)))
+    (dotimes (i 4)
+      (q/toLily i (format "%s" (elt last-cmds i))))))
+
+(global-set-key (kbd "C-c l c") (lambda () (interactive) (q/toLily 0 "clear")))
+(global-set-key (kbd "C-c l s") #'q/toLily)
+
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
