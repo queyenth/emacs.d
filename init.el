@@ -95,10 +95,10 @@
   (add-hook 'prog-mode-hook #'display-line-numbers-mode))
 
 (progn
-  (q/ensure-package 'ef-themes)
+  (q/ensure-package 'os1-theme "https://github.com/sashimacs/os1-theme")
   (q/ensure-package 'doom-themes)
   (mapc #'disable-theme custom-enabled-themes)
-  (load-theme 'doom-one-light :no-confirm))
+  (load-theme 'doom-tokyo-night :no-confirm))
 
 (progn
   (q/ensure-package 'all-the-icons)
