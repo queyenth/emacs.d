@@ -314,6 +314,13 @@
 (progn
   (q/ensure-package 'magit)
   (global-set-key (kbd "C-c g") '("magit" . magit-status))
+
+  (defun q/magit-my-branch-spin-off (branch &optional from)
+    (interactive (list (magit-read-string-ns "Spin off branch" (format "feature/%s" (car (split-string org-clock-heading))))
+                       (car (last (magit-region-values 'commit)))))
+    (magit-branch-spinoff branch from))
+  (global-set-key (kbd "C-c s") '("spinoff" . q/magit-my-branch-spin-off))
+
   (with-eval-after-load 'project
     (define-key project-prefix-map "m" #'magit-project-status)
     (add-to-list 'project-switch-commands '(magit-project-status "Magit"))))
