@@ -23,9 +23,10 @@
 (when (not package-archive-contents)
   (package-refresh-contents))
 
-(defun q/ensure-package (package)
+(defun q/ensure-package (package &optional url)
   (unless (package-installed-p package)
-    (package-install package)))
+    (if url (package-vc-install url)
+      (package-install package))))
 
 (setq custom-file (concat user-emacs-directory "emacs-custom.el"))
 (load custom-file)
