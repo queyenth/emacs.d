@@ -408,6 +408,9 @@
 (global-set-key (kbd "C-c m u") '("setup upgrade" . q/magento-setup-upgrade))
 
 (progn
+  (q/ensure-package 'consult))
+
+(progn
   (q/ensure-package 'meow)
   (defun meow-setup ()
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
