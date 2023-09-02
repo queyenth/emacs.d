@@ -5,7 +5,8 @@
 (setq comp-deferred-compilation t)
 
 (defun q/after-frame (&optional frame)
-  (set-face-attribute 'default nil :font "FiraCode Nerd Font Mono" :height 100))
+  (set-face-attribute 'default nil :font "Iosevka Nerd Font" :height 110)
+  (set-face-attribute 'italic nil :family "Iosevka Nerd Font Italic"))
 
 (add-hook 'after-make-frame-functions #'q/after-frame)
 
@@ -97,8 +98,9 @@
 (progn
   (q/ensure-package 'os1-theme "https://github.com/sashimacs/os1-theme")
   (q/ensure-package 'doom-themes)
+  (q/ensure-package 'ef-themes)
   (mapc #'disable-theme custom-enabled-themes)
-  (load-theme 'doom-tokyo-night :no-confirm))
+  (load-theme 'ef-day :no-confirm)) 
 
 (progn
   (q/ensure-package 'all-the-icons)
@@ -164,7 +166,7 @@
   (setq org-refile-use-outline-path 'file)
   (setq org-outline-path-complete-in-steps nil)
   (setq org-indent-indentation-per-level 1)
-  (setq org-adapt-indentation t)
+  (setq org-adapt-indentation nil)
   (setq org-hide-leading-stars t)
   (setq org-hide-emphasis-markers t)
   (setq org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
@@ -182,8 +184,10 @@
   (setq org-return-follows-link t)
 
   (setq org-capture-templates
-        `(("i" "inbox" entry (file ,(q/get-org-file "/inbox.org"))
+        `(("t" "inbox task" entry (file ,(q/get-org-file "/inbox.org"))
            (file ,(q/get-org-file "/tmpl/task")))
+          ("i" "idea" entry (file ,(q/get-org-file "/ideas.org"))
+           (file ,(q/get-org-file "/tmpl/idea")))
           ("l" "link" entry (file ,(q/get-org-file "/inbox.org"))
            (file ,(q/get-org-file "/tmpl/link")) :immediate-finish t)))
 
@@ -236,7 +240,9 @@
   (setq org-drill-left-cloze-delimiter "<[")
   (setq org-drill-right-cloze-delimiter "]>"))
 
-(q/ensure-package 'org-download)
+(progn
+  (q/ensure-package 'org-download)
+  (require 'org-download))
 (q/ensure-package 'org-cliplink)
 
 (global-set-key (kbd "C-c o a") '("agenda" . org-agenda))
@@ -248,6 +254,7 @@
 
 (global-set-key (kbd "C-c o t i") '("clock in" . org-clock-in))
 (global-set-key (kbd "C-c o t o") '("clock out" . org-clock-out))
+(global-set-key (kbd "C-c o t g") '("clock go to" . org-clock-goto))
 
 (progn
   (setq org-toggl-inherit-toggl-properties t)
@@ -258,7 +265,6 @@
 
 (progn
   (q/ensure-package 'vertico)
-  (keymap-set vertico-map "C-e" #'vertico-previous)
   (setq vertico-cycle t)
   (vertico-mode))
 
@@ -374,34 +380,21 @@
 (defun q/magento-static-content-deploy (langs)
   (interactive (list
                 (read-string "Locales: " nil nil "en_US en_GB")))
-  (q/magento (concat "setup-static-content:deploy -f " langs)))
+  (q/magento (concat "setup:static-content:deploy -f " langs)))
 
 (setq nxml-child-indent 4)
 
 (add-hook 'typescript-ts-mode-hook #'eglot-ensure)
-
-(setq q/notes-directory (concat q/org-directory "/notes"))
-(progn
-  (q/ensure-package 'denote)
-  (setq denote-directory q/notes-directory)
-  (setq denote-known-keywords '("emacs" "book" "idea" "philosophy"))
-  (setq denote-infer-keywords nil))
-
-(defun q/find-note ()
-  (interactive)
-  (let ((default-directory (concat (string-trim-right denote-directory "/") "/")))
-    (call-interactively 'find-file)))
-
-(global-set-key (kbd "C-c n n") '("new" . denote))
-(global-set-key (kbd "C-c n l") '("link" . denote-link))
-(global-set-key (kbd "C-c n b") '("backlinks" . denote-link-backlinks))
-(global-set-key (kbd "C-c n o") '("find" . q/find-note))
 
 (progn
   (q/ensure-package 'pinentry)
   (pinentry-start))
 
 (q/ensure-package 'password-store)
+(auth-source-pass-enable)
+(global-set-key (kbd "C-c y y") '("copy" . password-store-copy))
+(global-set-key (kbd "C-c y p") '("insert" . password-store-insert))
+(global-set-key (kbd "C-c y e") '("insert" . password-store-edit))
 
 (global-set-key (kbd "C-c m m") '("run some command" . q/magento))
 (global-set-key (kbd "C-c m c") '("clear cache" . q/magento-clear-cache))
@@ -577,12 +570,14 @@
      '("y" . meow-save)
      '("Y" . meow-sync-grab)
      '("z" . meow-pop-selection)
-     '("'" . repeat)
+     '("'" . consult-register)
+     '("\"" . consult-register-store)
      '("=" . meow-indent)
      '("?" . meow-comment)
      '("`" . downcase-dwim)
      '("~" . upcase-dwim)
      '("/" . consult-line)
+     '("^" . back-to-indentation)
      '("<escape>" . ignore)))
   (require 'meow)
   (meow-setup)
@@ -592,9 +587,13 @@
   (q/ensure-package 'eglot)
   (setq eglot-sync-connect nil)
   (setq eglot-events-buffer-size 0)
+  (defcustom lsp-intelephense-key ""
+    "Enter the intelephense key."
+    :type 'string
+    :group 'eglot)
   (with-eval-after-load 'eglot
     (add-to-list 'eglot-server-programs
-                 '((php-mode phps-mode) . ("intelephense" "--stdio")))))
+                 `((php-mode phps-mode) . ("intelephense" "--stdio" :initializationOptions (:licenseKey ,lsp-intelephense-key))))))
 (progn
   (with-eval-after-load 'eglot
     (add-to-list 'eglot-server-programs
@@ -618,9 +617,9 @@
 
 (defun q/toLily (line msg)
   (interactive (list
-                (read-number "Line (0-3): " 0)
+                (read-string "Line (0-3): " "0")
                 (read-string "Message: ")))
-  (shell-command (format "toLily %d '%s'" line msg)))
+  (async-start-process "whatever" "toLily" nil line msg))
 
 (define-minor-mode lily-keystrokes-mode
   "Send typed keystrokes to lily58's OLED"
@@ -630,32 +629,30 @@
       (add-hook 'pre-command-hook #'lily-keystrokes)
     (remove-hook 'pre-command-hook #'lily-keystrokes)))
 
-(defun lily-get-last-N (N)
-  (mapcar
-   #'reverse
-   (seq-drop
-    (seq-take
-     (reverse
-      (seq-reduce
-       (lambda (res key)
-         (cond
-          ((and (consp key) (null (car key)))
-           (push (cons (if (symbolp (cdr key)) (cdr key)
-                         "anonymous-command") nil) res))
-          ((or (symbolp key) (integerp key) (listp key))
-           (let ((first (reverse (pop res))))
-             (push (single-key-description key) first)
-             (push (reverse first) res)))))
-       (reverse (recent-keys t))
-       (list ()))) (+ N 1)) 1)))
+(defun q-recent-keys ()
+  (let (result keys)
+    (seq-doseq (elt (recent-keys t))
+      (pcase elt
+        (`(nil . ,command)
+         (push (cons (key-description (reverse keys))
+                     command)
+               result)
+         (setq keys nil))
+        (key
+         (push key keys))))
+    result))
 
 (defun lily-keystrokes ()
-  (let ((last-cmds (lily-get-last-N 4)))
+  (let ((last-cmds (seq-take (q-recent-keys) 4)))
     (dotimes (i 4)
-      (q/toLily i (format "%s" (elt last-cmds i))))))
+      (q/toLily (number-to-string i) (format "%s" (elt last-cmds i))))))
 
-(global-set-key (kbd "C-c l c") (lambda () (interactive) (q/toLily 0 "clear")))
+(global-set-key (kbd "C-c l c") (lambda () (interactive) (q/toLily "0" "clear")))
 (global-set-key (kbd "C-c l s") #'q/toLily)
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
+
+(progn
+  (q/ensure-package 'clojure-mode)
+  (q/ensure-package 'cider))
