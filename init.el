@@ -43,6 +43,11 @@
 (setq backup-directory-alist `(("." .,(concat user-emacs-directory "backups"))))
 (setq enable-recursive-minibuffers t)
 
+(setq sentence-end-double-space nil)
+(setq require-final-newline t)
+(setq frame-inhibit-implied-resize t)
+(setq show-trailing-whitespace t)
+
 (setq
  x-select-enable-clipboard t
  x-select-enable-primary t
@@ -74,6 +79,7 @@
 
 (progn
   (q/ensure-package 'minions)
+  (setq minions-prominent-modes '(wc-goal-mode meow-normal-mode meow-insert-mode meow-beacon-mode meow-keypad-mode meow-motion-mode))
   (minions-mode 1))
 
 (progn
@@ -404,6 +410,16 @@
 
 (progn
   (q/ensure-package 'consult))
+
+(defun mask-text (start end mask-char)
+  "Overwrite the region with the selected mask character."
+  (interactive "@*r\ncMasking character: ")
+  (let ((region-length (- end start))
+        (original-point (point)))
+    (delete-region start end)
+    (goto-char start)
+    (insert-char mask-char region-length)
+    (goto-char original-point)))
 
 (progn
   (q/ensure-package 'meow)
