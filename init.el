@@ -729,5 +729,3 @@
 (add-hook 'text-mode-hook #'abbrev-mode)
 (add-hook 'org-mode-hook #'variable-pitch-mode)
 
-(global-set-key (kbd "C-c c") '("compile" . compile))
-(global-set-key (kbd "C-c r") '("recompile" . recompile))
