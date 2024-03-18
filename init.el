@@ -5,8 +5,27 @@
 (setq comp-deferred-compilation t)
 
 (defun q/after-frame (&optional frame)
-  (set-face-attribute 'default nil :font "Iosevka Nerd Font" :height 110)
-  (set-face-attribute 'italic nil :family "Iosevka Nerd Font Italic"))
+  ;(set-face-attribute 'default nil :font "Iosevka Nerd Font" :height 110)
+  ;(set-face-attribute 'default nil :font "Iosevka Comfy" :height 110)
+
+  ;(set-face-attribute 'default nil :font "CaskaydiaCove Nerd Font" :height 110)
+  ;(set-face-attribute 'default nil :font "Monoid Nerd Font" :height 100)
+  ;(set-face-attribute 'default nil :font "Hack Nerd Font" :height 100)
+  ;(set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 100)
+  ;(set-face-attribute 'default nil :font "Inconsolata Nerd Font" :height 110)
+  ;(set-face-attribute 'default nil :font "UbuntuMono Nerd Font" :height 110)
+  ;(set-face-attribute 'default nil :font "AverageMono" :height 110)
+  ;(set-face-attribute 'default nil :font "OverpassM Nerd Font" :height 100)
+
+  (set-face-attribute 'default nil :font "IBM Plex Mono Text" :height 100)
+
+  ;This is the same as IBM Plex Mono (I think, but I can spot
+  ;something a biiiiiit different, or I'm imagining things) but with
+  ;icons and stuff
+  ;(set-face-attribute 'default nil :font "BlexMono Nerd Font" :height 100)
+
+  ;(set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 110)
+  (set-face-attribute 'variable-pitch nil :font "IBM Plex Sans Text"))
 
 (add-hook 'after-make-frame-functions #'q/after-frame)
 
