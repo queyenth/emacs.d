@@ -76,7 +76,13 @@
 
 (column-number-mode)
 (show-paren-mode 1)
-(savehist-mode)
+
+(progn
+  (setq history-length 500)
+  (setq history-delete-duplicates t)
+  (setq savehist-additional-variables '(register-alist kill-ring))
+  (savehist-mode))
+
 (auto-save-visited-mode)
 (global-auto-revert-mode)
 (global-so-long-mode 1)
