@@ -129,14 +129,21 @@
       (concat (substring str 0 (or length 10)) "...")
     str))
 
-(defun q/mode-line--buffer-name ()
+(defun q/mode-line--get-folder-path-short (length)
+  (if (buffer-file-name)
+      (s-join "/" (->> default-directory
+		       (s-split "/")
+		       (mapcar (lambda (x) (s-left length x)))))
+    ""))
+
+(defun q/mode-line--buffer-name (length)
   (when-let ((name (buffer-name)))
     (if (mode-line-window-selected-p)
-        name
+        (concat (q/mode-line--get-folder-path-short length) name)
       (q/mode-line-string-truncate name))))
 
 (defun q/mode-line-buffer-name ()
-  (let ((name (q/mode-line--buffer-name)))
+  (let ((name (q/mode-line--buffer-name 2)))
     (if buffer-read-only
         (format "%s %s" (char-to-string #xE0A2) name)
       name)))
