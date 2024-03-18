@@ -125,11 +125,10 @@
   (add-hook 'prog-mode-hook #'display-line-numbers-mode))
 
 (progn
-  (q/ensure-package 'os1-theme "https://github.com/sashimacs/os1-theme")
-  (q/ensure-package 'doom-themes)
   (q/ensure-package 'ef-themes)
+  (q/ensure-package 'almost-mono-themes)
   (mapc #'disable-theme custom-enabled-themes)
-  (load-theme 'ef-day :no-confirm)) 
+  (load-theme 'ef-day :no-confirm))
 
 (progn
   (q/ensure-package 'all-the-icons)
@@ -137,7 +136,7 @@
 
 (setq custom-tab-width 4)
 (setq tab-width 4)
-(setq-default indent-tabs-mode nil)
+(setq-default indent-tabs-mode t)
 (setq-default electric-indent-inhibit t)
 
 (setq tab-always-indent 'complete)
@@ -145,14 +144,10 @@
 (setq backward-delete-char-untabify-method 'hungry)
 
 (progn
-  (q/ensure-package 'undo-tree)
-  (require 'undo-tree)
-  (global-undo-tree-mode)
-  (setq undo-tree-history-directory-alist `(("." . ,(concat user-emacs-directory "undo-tree")))))
-
-(progn
   (q/ensure-package 'all-the-icons-dired)
   (add-hook 'dired-mode-hook #'all-the-icons-dired-mode))
+
+(global-set-key (kbd "C-x !") 'delete-other-windows-vertically)
 
 (progn
   (setq dired-dwim-target t)
@@ -179,7 +174,6 @@
                                   ("Europe/London" "London")
                                   ("Europe/Paris" "Paris")
                                   ("Europe/Moscow" "Moscow")
-                                  ("Asia/Tbilisi" "Tbilisi")
                                   ("Asia/Omsk" "Omsk")
                                   ("Asia/Tokyo" "Tokyo")))
 
@@ -196,8 +190,8 @@
   (setq org-outline-path-complete-in-steps nil)
   (setq org-indent-indentation-per-level 1)
   (setq org-adapt-indentation nil)
-  (setq org-hide-leading-stars t)
-  (setq org-hide-emphasis-markers t)
+  (setq org-hide-leading-stars nil)
+  (setq org-hide-emphasis-markers nil)
   (setq org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
   (setq org-cycle-separator-lines 1)
   (setq org-startup-with-inline-images t)
@@ -445,7 +439,27 @@
     (goto-char original-point)))
 
 (progn
+  (q/ensure-package 'surround)
+  (require 'surround))
+
+(setopt undo-no-redo t)
+
+(progn
   (q/ensure-package 'meow)
+  (defmacro q/meow-call-negative (form)
+    `(let ((current-prefix-arg -1))
+       (call-interactively ,form)))
+  (defun q/meow-negative-find ()
+    (interactive)
+    (q/meow-call-negative 'meow-find))
+  (defun q/meow-negative-till ()
+    (interactive)
+    (q/meow-call-negative 'meow-till))
+  (defun q/meow-pop-mark ()
+    (interactive)
+    (let ((current-prefix-arg 4))
+      (call-interactively 'set-mark-command)))
+
   (defconst meow-cheatsheet-layout-canary
     '((<TLDE> "`"	"~")
       (<AE01> "1"	"!")
@@ -499,8 +513,8 @@
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-canary)
     (meow-motion-overwrite-define-key
      ;; Canary
-     '("n" . meow-next)
      '("e" . meow-prev)
+     '("n" . meow-next)
      ;; Qwerty
      ;'("j" . meow-next)
      ;'("k" . meow-prev)
@@ -509,8 +523,8 @@
      ;; SPC n/e or j/k will run the original command in MOTION state.
 
      ;; Canary
-     '("n" . "H-n")
      '("e" . "H-e")
+     '("n" . "H-n")
 
      ;; Qwerty
      ;;'("j" . "H-j")
@@ -528,7 +542,23 @@
      '("9" . meow-digit-argument)
      '("0" . meow-digit-argument)
      '("/" . meow-keypad-describe-key)
-     '("?" . meow-cheatsheet))
+     '("?" . meow-cheatsheet)
+
+     '("b" . switch-to-buffer)
+     '("j" . dired-jump)
+     '("v" . magit)
+     '("%" . query-replace)
+     '("s" . isearch-forward)
+
+     '("w m" . windmove-left)
+     '("w n" . windmove-down)
+     '("w e" . windmove-up)
+     '("w i" . windmove-right)
+     '("w d" . delete-other-windows)
+     '("w v" . delete-other-windows-vertically)
+     '("w s n" . split-window-below)
+     '("w s i" . split-window-right))
+
     (meow-normal-define-key
      '("0" . meow-expand-0)
      '("9" . meow-expand-9)
@@ -541,82 +571,96 @@
      '("2" . meow-expand-2)
      '("1" . meow-expand-1)
      '("-" . negative-argument)
+     (cons "_" surround-keymap)
      '(";" . meow-reverse)
+     '(":" . execute-extended-command)
      '("," . meow-inner-of-thing)
      '("." . meow-bounds-of-thing)
-     '("[" . meow-beginning-of-thing)
-     '("]" . meow-end-of-thing)
+     '("(" . meow-beginning-of-thing)
+     '(")" . meow-end-of-thing)
+     '("C-(" . (lambda () (interactive) (surround-insert "(")))
+     '("M-(" . (lambda (new) (interactive (list (char-to-string (read-char "replace ")))) (surround-change "(" new)))
+     '("{" . backward-paragraph)
+     '("}" . forward-paragraph)
+     '("C-{" . (lambda () (interactive) (surround-insert "{")))
+     '("M-{" . (lambda (new) (interactive (list (char-to-string (read-char "replace ")))) (surround-change "{" new)))
+     '("[" . beginning-of-buffer)
+     '("]" . end-of-buffer)
      '("a" . meow-append)
      '("A" . meow-open-below)
      '("b" . meow-back-word)
      '("B" . meow-back-symbol)
      '("c" . meow-change)
-     '("d" . meow-delete)
-     '("D" . meow-backward-delete)
+     ;'("C" . ignore)
+     '("d" . meow-kill)
+     '("D" . xref-find-definitions)
+     '("<" . xref-go-back)
+     '(">" . xref-go-forward)
+     '("e" . meow-prev)
+     '("E" . meow-prev-expand)
      '("f" . meow-find)
+     '("F" . q/meow-negative-find)
      '("g" . meow-cancel-selection)
      '("G" . meow-grab)
-
-     ;; Canary
+     '("h" . meow-search)
+     ;'("H" . ignore)
+     '("i" . meow-right)
+     '("I" . meow-right-expand)
+     '("j" . meow-join)
+     ;'("J" . ignore)
+     '("k" . meow-next-word)
+     '("K" . meow-next-symbol)
+     '("l" . meow-line)
+     '("L" . meow-goto-line)
      '("m" . meow-left)
      '("M" . meow-left-expand)
      '("n" . meow-next)
      '("N" . meow-next-expand)
-     '("e" . meow-prev)
-     '("E" . meow-prev-expand)
-     '("i" . meow-right)
-     '("I" . meow-right-expand)
-     '("j" . meow-join)
-     '("h" . meow-search)
-     '("k" . meow-next-word)
-     '("K" . meow-next-symbol)
-     '("l" . meow-insert)
-     '("L" . meow-open-above)
-
-     ;; Qwerty
-     ;;'("h" . meow-left)
-     ;;'("H" . meow-left-expand)
-     ;;'("j" . meow-next)
-     ;;'("J" . meow-next-expand)
-     ;;'("k" . meow-prev)
-     ;;'("K" . meow-prev-expand)
-     ;;'("l" . meow-right)
-     ;;'("L" . meow-right-expand)
-     ;;'("m" . meow-join)
-     ;;'("n" . meow-search)
-     ;;'("e" . meow-next-word)
-     ;;'("E" . meow-next-symbol)
-     ;;'("i" . meow-insert)
-     ;;'("I" . meow-open-above)
-
      '("o" . meow-block)
      '("O" . meow-to-block)
      '("p" . meow-yank)
+     '("P" . meow-clipboard-yank)
      '("q" . meow-quit)
      '("Q" . consult-goto-line)
      '("r" . meow-replace)
+     '("C-r" . undo-redo)
      '("R" . meow-swap-grab)
-     '("s" . meow-kill)
+     '("s" . meow-insert)
+     '("S" . meow-open-above)
      '("t" . meow-till)
-     '("C-r" . undo-tree-redo)
-     '("u" . undo-tree-undo)
+     '("T" . q/meow-negative-till)
+     '("u" . meow-undo)
      '("U" . meow-undo-in-selection)
      '("v" . meow-visit)
+     ;'("V" . ignore)
      '("w" . meow-mark-word)
      '("W" . meow-mark-symbol)
-     '("x" . meow-line)
-     '("X" . meow-goto-line)
+     '("x" . meow-delete)
+     '("X" . meow-backward-delete)
      '("y" . meow-save)
      '("Y" . meow-sync-grab)
      '("z" . meow-pop-selection)
-     '("'" . consult-register)
-     '("\"" . consult-register-store)
+     '("Z" . q/meow)
+     '("'" . (lambda () (interactive) (surround-insert "'")))
+     '("\"" . (lambda () (interactive) (surround-insert "\"")))
+     '("C-\"" . (lambda () (interactive) (surround-insert "\"")))
+     '("C-'" . (lambda (new) (interactive (list (char-to-string (read-char "replace ")))) (surround-change "'" new)))
+     '("C-\"" . (lambda (new) (interactive (list (char-to-string (read-char "replace ")))) (surround-change "\"" new)))
      '("=" . meow-indent)
-     '("?" . meow-comment)
+     ;'("+" . ignore)
      '("`" . downcase-dwim)
      '("~" . upcase-dwim)
      '("/" . consult-line)
-     '("^" . back-to-indentation)
+     '("?" . meow-comment)
+     '("!" . transpose-lines)
+     '("@" . mark-paragraph)
+     '("#" . mark-defun)
+     ;'("$" . ignore)
+     '("%" . exchange-point-and-mark)
+     '("^" . meow-back-to-indentation)
+     '("&" . repeat)
+     '("C-*" . meow-start-kmacro-or-insert-counter)
+     '("*" . meow-end-or-call-kmacro)
      '("<escape>" . ignore)))
   (require 'meow)
   (meow-setup)
@@ -642,52 +686,22 @@
   (q/ensure-package 'corfu)
   (setq completion-cycle-threshold 3)
   (setq corfu-cycle t)
-  (setq corfu-auto t)
-  (setq corfu-auto-delay 0.1)
-  (setq corfu-auto-prefix 4)
+  ;; (setq corfu-auto nil)
+  ;; (setq corfu-auto-delay 0.1)
+  ;; (setq corfu-auto-prefix 4)
   (setq corfu-separator ?\s)
   (setq corfu-preview-current nil)
-  (setq corfu-preselect-first nil)
+  ;; (setq corfu-preselect-first nil)
   (global-corfu-mode))
+
+(progn
+  (q/ensure-package 'cape)
+  (add-to-list 'completion-at-point-functions #'cape-file))
 
 (progn
   (q/ensure-package 'ace-window)
   (global-set-key (kbd "M-o") 'ace-window))
 
-(defun q/toLily (line msg)
-  (interactive (list
-                (read-string "Line (0-3): " "0")
-                (read-string "Message: ")))
-  (async-start-process "whatever" "toLily" nil line msg))
-
-(define-minor-mode lily-keystrokes-mode
-  "Send typed keystrokes to lily58's OLED"
-  :lighter " Lily58"
-  :global t
-  (if lily-keystrokes-mode
-      (add-hook 'pre-command-hook #'lily-keystrokes)
-    (remove-hook 'pre-command-hook #'lily-keystrokes)))
-
-(defun q-recent-keys ()
-  (let (result keys)
-    (seq-doseq (elt (recent-keys t))
-      (pcase elt
-        (`(nil . ,command)
-         (push (cons (key-description (reverse keys))
-                     command)
-               result)
-         (setq keys nil))
-        (key
-         (push key keys))))
-    result))
-
-(defun lily-keystrokes ()
-  (let ((last-cmds (seq-take (q-recent-keys) 4)))
-    (dotimes (i 4)
-      (q/toLily (number-to-string i) (format "%s" (elt last-cmds i))))))
-
-(global-set-key (kbd "C-c l c") (lambda () (interactive) (q/toLily "0" "clear")))
-(global-set-key (kbd "C-c l s") #'q/toLily)
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
@@ -695,3 +709,21 @@
 (progn
   (q/ensure-package 'clojure-mode)
   (q/ensure-package 'cider))
+
+(setq isearch-lazy-count t)
+(setq lazy-count-prefix-format "(%s/%s) ")
+(setq lazy-count-suffix-format nil)
+
+(setq search-whitespace-regexp ".*?")
+
+(load-file (concat user-emacs-directory "modeline.el"))
+(require 'modeline)
+(q/modeline-subtle-mode 1)
+
+(define-abbrev text-mode-abbrev-table "qqn" "queyenth")
+(define-abbrev text-mode-abbrev-table "qqgit" "https://github.com/queyenth")
+(add-hook 'text-mode-hook #'abbrev-mode)
+(add-hook 'org-mode-hook #'variable-pitch-mode)
+
+(global-set-key (kbd "C-c c") '("compile" . compile))
+(global-set-key (kbd "C-c r") '("recompile" . recompile))
