@@ -2,9 +2,27 @@
 (setq user-full-name "Queyenth")
 (setq user-mail-address "q@queyenth.xyz")
 
-(setq comp-deferred-compilation t)
+(setq native-comp-jit-compilation t)
 
-(defun q/after-frame (&optional frame)
+(when (boundp 'x-mod3-keysym) (setopt x-mod3-keysym 'hyper))
+
+(keymap-global-set "H-n" #'windmove-down)
+(keymap-global-set "H-m" #'windmove-left)
+(keymap-global-set "H-e" #'windmove-up)
+(keymap-global-set "H-i" #'windmove-right)
+(keymap-global-set "H-N" #'windmove-swap-states-down)
+(keymap-global-set "H-M" #'windmove-swap-states-left)
+(keymap-global-set "H-E" #'windmove-swap-states-up)
+(keymap-global-set "H-I" #'windmove-swap-states-right)
+(keymap-global-set "H-f" #'find-file)
+(keymap-global-set "H-b" #'switch-to-buffer)
+(keymap-global-set "H-B" #'switch-to-buffer-other-window)
+(keymap-global-set "H-d" #'dired)
+(keymap-global-set "H-j" #'dired-jump)
+(keymap-global-set "H-J" #'dired-jump-other-window)
+(keymap-global-set "H-v" #'magit)
+
+(defun q/after-frame (&optional _)
   ;(set-face-attribute 'default nil :font "Iosevka Nerd Font" :height 110)
   ;(set-face-attribute 'default nil :font "Iosevka Comfy" :height 110)
 
