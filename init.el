@@ -239,6 +239,7 @@
 
   (setq org-confirm-babel-evaluate nil)
   (setq org-src-tab-acts-natively t)
+  (require 'org-tempo)
   (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist '("py" . "src python")))
@@ -368,7 +369,7 @@
     (interactive (list (magit-read-string-ns "Spin off branch" (format "feature/%s" (car (split-string org-clock-heading))))
                        (car (last (magit-region-values 'commit)))))
     (magit-branch-spinoff branch from))
-  (global-set-key (kbd "C-c s") '("spinoff" . q/magit-my-branch-spin-off))
+  (global-set-key (kbd "C-c S") '("spinoff" . q/magit-my-branch-spin-off))
 
   (with-eval-after-load 'project
     (define-key project-prefix-map "m" #'magit-project-status)
@@ -726,6 +727,15 @@
   (meow-global-mode 1))
 
 (progn
+  (flymake-mode)
+  (defvar-keymap flymake-repeat-map
+    :repeat (:exit (flymake-show-buffer-diagnostics))
+    "n" #'flymake-goto-next-error
+    "e" #'flymake-goto-prev-error
+    "b" #'flymake-show-buffer-diagnostics)
+  (keymap-set global-map "C-c D" flymake-repeat-map))
+
+(progn
   (q/ensure-package 'eglot)
   (setq eglot-sync-connect nil)
   (setq eglot-events-buffer-size 0)
@@ -735,11 +745,16 @@
     :group 'eglot)
   (with-eval-after-load 'eglot
     (add-to-list 'eglot-server-programs
-                 `((php-mode phps-mode) . ("intelephense" "--stdio" :initializationOptions (:licenseKey ,lsp-intelephense-key))))))
+                 `((php-mode phps-mode php-ts-mode) . ("intelephense" "--stdio" :initializationOptions (:licenseKey ,lsp-intelephense-key))))))
+
 (progn
   (with-eval-after-load 'eglot
     (add-to-list 'eglot-server-programs
                  '((typescript-ts-mode) . ("typescript-language-server" "--stdio")))))
+
+(progn
+  (q/ensure-package 'dape)
+  (setq dape-buffer-window-arrangement 'right))
 
 (progn
   (q/ensure-package 'corfu)
@@ -752,6 +767,10 @@
   (setq corfu-preview-current nil)
   ;; (setq corfu-preselect-first nil)
   (global-corfu-mode))
+
+(progn
+  (q/ensure-package 'corfu-candidate-overlay)
+  (corfu-candidate-overlay-mode))
 
 (progn
   (q/ensure-package 'cape)
@@ -784,3 +803,7 @@
 (add-hook 'text-mode-hook #'abbrev-mode)
 (add-hook 'org-mode-hook #'variable-pitch-mode)
 
+(setopt diff-default-read-only t)
+
+(keymap-global-set "C-c c" #'compile)
+(keymap-global-set "C-c r" #'recompile)
