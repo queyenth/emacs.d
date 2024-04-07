@@ -797,6 +797,8 @@
 (load-file (concat user-emacs-directory "modeline.el"))
 (require 'modeline)
 (q/modeline-subtle-mode 1)
+(q/mode-line-set-folder-cut-each 3)
+(q/mode-line-set-folder-count 3)
 
 (define-abbrev text-mode-abbrev-table "qqn" "queyenth")
 (define-abbrev text-mode-abbrev-table "qqgit" "https://github.com/queyenth")

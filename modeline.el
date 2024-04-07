@@ -1,6 +1,4 @@
 ;; -*- lexical-binding: t -*-
-(require 'dash)
-
 (defun q/modeline-set-faces (_theme)
   "Make THEME mode lines subtle."
   (let ((subtle (face-foreground 'shadow)))
@@ -100,10 +98,11 @@
 
 (defvar-local q/mode-line-meow-state
     '(:eval
-      (if (mode-line-window-selected-p)
+      (when (mode-line-window-selected-p)
           (cond (meow-normal-mode (propertize " NORMAL " 'face 'q/modeline-indicator-beige-bg))
                 (meow-insert-mode (propertize " INSERT " 'face 'q/modeline-indicator-pine-bg))
                 (meow-keypad-mode (propertize " KEYPAD " 'face 'q/modeline-indicator-purple-bg))
+                (meow-motion-mode (propertize " MOTION " 'face 'q/modeline-indicator-rose-bg))
                 (meow-beacon-mode (propertize " BEACON " 'face 'q/modeline-indicator-rose-bg))))))
 
 (defvar-local q/mode-line-kbd-macro
@@ -131,10 +130,8 @@
 
 (defun q/mode-line--get-folder-path-short (length)
   (if (buffer-file-name)
-      (s-join "/" (->> default-directory
-		       (s-split "/")
-		       (mapcar (lambda (x) (s-left length x)))))
-    ""))
+      (let ((dirs (string-split default-directory "/")))
+	(string-join (mapcar (lambda (x) (if length (string-limit x length) x)) (last dirs (or q/mode-line-folder-count (length dirs)))) "/"))))
 
 (defun q/mode-line--buffer-name (length)
   (when-let ((name (buffer-name)))
@@ -142,8 +139,22 @@
         (concat (q/mode-line--get-folder-path-short length) name)
       (q/mode-line-string-truncate name))))
 
+(defcustom q/mode-line-folder-cut-each nil
+  "Cut N characters from each folder in path.")
+
+(defcustom q/mode-line-folder-count nil
+  "How many folders to show in path.")
+
+(defun q/mode-line-set-folder-cut-each (length)
+  (interactive (list (read-number "Length: " q/mode-line-folder-cut-each)))
+  (setq q/mode-line-folder-cut-each (if (and length (>= length 0)) length nil)))
+
+(defun q/mode-line-set-folder-count (length)
+  (interactive (list (read-number "Count: " q/mode-line-folder-count)))
+  (setq q/mode-line-folder-count (if (and length (>= length 1)) length nil)))
+
 (defun q/mode-line-buffer-name ()
-  (let ((name (q/mode-line--buffer-name 2)))
+  (let ((name (q/mode-line--buffer-name q/mode-line-folder-cut-each)))
     (if buffer-read-only
         (format "%s %s" (char-to-string #xE0A2) name)
       name)))
@@ -192,10 +203,10 @@
     (propertize indicator 'face 'shadow)))
 
 (defun q/mode-line-major-mode-name ()
-  (->> (symbol-name major-mode)
-       (string-replace "-mode" "")
-       (string-replace "-" " ")
-       (capitalize)))
+  (thread-last (symbol-name major-mode)
+	       (string-replace "-mode" "")
+	       (string-replace "-" " ")
+	       (downcase)))
 
 (defun q/mode-line-major-mode-help-echo ()
   (if-let ((parent (get major-mode 'derived-mode-parent)))
