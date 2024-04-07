@@ -81,7 +81,7 @@
 
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq create-lockfiles nil)
-(setq-default save-place t)
+(save-place-mode)
 (setq save-place-file (concat user-emacs-directory "places"))
 (setq backup-directory-alist `(("." .,(concat user-emacs-directory "backups"))))
 (setq enable-recursive-minibuffers t)
