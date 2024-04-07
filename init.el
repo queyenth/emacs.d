@@ -72,7 +72,8 @@
       (package-install package))))
 
 (setq custom-file (concat user-emacs-directory "emacs-custom.el"))
-(load custom-file)
+(when (file-exists-p custom-file)
+  (load custom-file))
 
 (add-to-list 'load-path (concat user-emacs-directory "custom"))
 
