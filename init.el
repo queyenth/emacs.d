@@ -563,22 +563,14 @@
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-canary)
     (meow-motion-overwrite-define-key
      ;; Canary
-     '("e" . meow-prev)
      '("n" . meow-next)
-     ;; Qwerty
-     ;'("j" . meow-next)
-     ;'("k" . meow-prev)
+     '("e" . meow-prev)
      '("<escape>" . ignore))
     (meow-leader-define-key
-     ;; SPC n/e or j/k will run the original command in MOTION state.
+     ;; SPC n/e will run the original command in MOTION state.
 
-     ;; Canary
-     '("e" . "H-e")
      '("n" . "H-n")
-
-     ;; Qwerty
-     ;;'("j" . "H-j")
-     ;;'("k" . "H-k")
+     '("e" . "H-e")
 
      ;; Use SPC (0-9) for digit arguments.
      '("1" . meow-digit-argument)
@@ -591,28 +583,41 @@
      '("8" . meow-digit-argument)
      '("9" . meow-digit-argument)
      '("0" . meow-digit-argument)
+     '("u" . meow-universal-argument)
      '("/" . meow-keypad-describe-key)
      '("?" . meow-cheatsheet)
 
+     ; Move all of this to C-c bindings.
+     '("f" . find-file)
+     '("F" . find-file-other-window)
+     '("k" . kill-this-buffer)
      '("b" . switch-to-buffer)
+     '("B" . switch-to-buffer-other-window)
      '("j" . dired-jump)
+     '("J" . dired-jump-other-window)
      '("v" . magit)
+     '("V" . magit-find-file-other-window)
      '("%" . query-replace)
-     '("s" . isearch-forward)
 
+     '("s p" . mark-paragraph)
+     '("s w" . mark-word)
+     '("s d" . mark-defun)
+     '("s f" . mark-sexp)
+
+     '("t p" . transpose-paragraphs)
      '("t c" . transpose-chars)
      '("t w" . transpose-words)
      '("t l" . transpose-lines)
      '("t f" . transpose-sexps)
 
-     '("w m" . windmove-left)
-     '("w n" . windmove-down)
-     '("w e" . windmove-up)
-     '("w i" . windmove-right)
-     '("w d" . delete-other-windows)
-     '("w v" . delete-other-windows-vertically)
-     '("w s n" . split-window-below)
-     '("w s i" . split-window-right))
+     '("," . xref-pop-marker-stack)
+     '("." . xref-find-definitions)
+
+     '("'" . point-to-register)
+     '("\"" . jump-to-register)
+
+     '(";" . copy-to-register)
+     '(":" . insert-register))
 
     (meow-normal-define-key
      '("0" . meow-expand-0)
@@ -639,8 +644,8 @@
      '("}" . forward-paragraph)
      '("C-{" . (lambda () (interactive) (surround-insert "{")))
      '("M-{" . (lambda (new) (interactive (list (char-to-string (read-char "replace ")))) (surround-change "{" new)))
-     '("[" . beginning-of-buffer)
-     '("]" . end-of-buffer)
+     '("[" . backward-sexp)
+     '("]" . forward-sexp)
      '("a" . meow-append)
      '("A" . meow-open-below)
      '("b" . meow-back-word)
@@ -648,9 +653,7 @@
      '("c" . meow-change)
      ;'("C" . ignore)
      '("d" . meow-kill)
-     '("D" . xref-find-definitions)
-     '("<" . xref-go-back)
-     '(">" . xref-go-forward)
+     '("D" . meow-clipboard-kill)
      '("e" . meow-prev)
      '("E" . meow-prev-expand)
      '("f" . meow-find)
@@ -662,7 +665,7 @@
      '("i" . meow-right)
      '("I" . meow-right-expand)
      '("j" . meow-join)
-     ;'("J" . ignore)
+     '("J" . (lambda () (interactive) (join-line 1)))
      '("k" . meow-next-word)
      '("K" . meow-next-symbol)
      '("l" . meow-line)
@@ -687,7 +690,7 @@
      '("u" . meow-undo)
      '("U" . meow-undo-in-selection)
      '("v" . meow-visit)
-     ;'("V" . ignore)
+     '("V" . consult-yank-from-kill-ring)
      '("w" . meow-mark-word)
      '("W" . meow-mark-symbol)
      '("x" . meow-delete)
@@ -700,19 +703,21 @@
      '("\"" . (lambda () (interactive) (surround-insert "\"")))
      '("C-'" . (lambda (new) (interactive (list (char-to-string (read-char "replace ")))) (surround-change "'" new)))
      '("C-\"" . (lambda (new) (interactive (list (char-to-string (read-char "replace ")))) (surround-change "\"" new)))
+     '("<" . beginning-of-defun)
+     '(">" . end-of-defun)
+     '("@" . backward-up-list)
+     '("#" . down-list)
      '("=" . meow-indent)
      ;'("+" . ignore)
      '("`" . downcase-dwim)
      '("~" . upcase-dwim)
      '("/" . consult-line)
      '("?" . meow-comment)
-     ;'("!" . transpose-lines)
-     '("@" . mark-paragraph)
-     '("#" . mark-defun)
+     '("!" . repeat)
      ;'("$" . ignore)
      '("%" . exchange-point-and-mark)
      '("^" . meow-back-to-indentation)
-     '("&" . repeat)
+     '("&" . meow-clipboard-save)
      '("C-*" . meow-start-kmacro-or-insert-counter)
      '("*" . meow-end-or-call-kmacro)
      '("<escape>" . ignore)))
