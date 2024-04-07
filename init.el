@@ -110,6 +110,8 @@
 (global-auto-revert-mode)
 (global-so-long-mode 1)
 (pixel-scroll-precision-mode)
+(setopt window-resize-pixelwise t)
+(setopt frame-resize-pixelwise t)
 
 (setq inhibit-startup-message t)
 (progn
