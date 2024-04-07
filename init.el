@@ -459,7 +459,40 @@
   (q/ensure-package 'surround)
   (require 'surround))
 
+(q/ensure-package 'drag-stuff)
+
 (setopt undo-no-redo t)
+
+(repeat-mode)
+
+(defvar-keymap drag-stuff-repeat-map
+  :repeat t
+  "n" #'drag-stuff-down
+  "e" #'drag-stuff-up
+  "i" #'drag-stuff-right
+  "m" #'drag-stuff-left)
+
+(keymap-set global-map "C-c d" drag-stuff-repeat-map)
+
+(defvar-keymap windmove-repeat-map
+  :repeat (:exit (balance-windows delete-other-windows delete-other-windows-vertically follow-delete-other-windows-and-split clone-indirect-buffer split-window-below split-window-right))
+  "n" #'windmove-down
+  "N" #'windmove-swap-states-down
+  "e" #'windmove-up
+  "E" #'windmove-swap-states-up
+  "i" #'windmove-right
+  "I" #'windmove-swap-states-right
+  "m" #'windmove-left
+  "M" #'windmove-swap-states-left
+  "=" #'balance-windows
+  "d" #'delete-other-windows
+  "v" #'delete-other-windows-vertically
+  "-" #'split-window-below
+  "|" #'split-window-right
+  "f" #'follow-delete-other-windows-and-split
+  "c" #'clone-indirect-buffer)
+
+(keymap-set global-map "C-c w" windmove-repeat-map)
 
 (progn
   (q/ensure-package 'meow)
