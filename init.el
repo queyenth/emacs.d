@@ -161,7 +161,7 @@
 
 (setq custom-tab-width 4)
 (setq tab-width 4)
-(setq-default indent-tabs-mode t)
+(setq-default indent-tabs-mode nil)
 (setq-default electric-indent-inhibit t)
 
 (setq tab-always-indent 'complete)
