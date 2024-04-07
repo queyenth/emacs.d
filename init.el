@@ -382,24 +382,22 @@
     (interactive)
     (kill-matching-buffers "\* docker-compose exec" nil t)))
 
-(progn
-  (q/ensure-package 'yasnippet)
-  (q/ensure-package 'yasnippet-snippets)
-  (yas-global-mode 1))
-
-(q/ensure-package 's)
-
-(defun q/yas-magento-get-namespace-path ()
+(defun q/magento-get-namespace-path ()
   (let* ((file-path (file-name-directory (or (buffer-file-name)
-                                              (buffer-name (current-buffer)))))
-          (namespace (s-replace "/" "\\" (and (string-match ".*/app/code/\\(.*\\)/" file-path)
+                                             (buffer-name (current-buffer)))))
+          (namespace (string-replace "/" "\\" (and (string-match ".*/app/code/\\(.*\\)/" file-path)
                                               (match-string 1 file-path)))))
     namespace))
+
+(define-skeleton q/skel-magento-namespace
+  "Inserts a namespace for current file."
+  nil
+  "namespace " (q/magento-get-namespace-path) ";\n")
 
 (q/ensure-package 'web-mode)
 (progn
   (q/ensure-package 'php-mode)
-  (add-hook 'php-mode-hook #'eglot-ensure))
+  (q/ensure-package 'php-ts-mode "https://github.com/emacs-php/php-ts-mode"))
 
 (defun q/magento (command)
   (interactive (list
