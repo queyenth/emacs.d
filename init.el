@@ -172,16 +172,9 @@
   (q/ensure-package 'all-the-icons-dired)
   (add-hook 'dired-mode-hook #'all-the-icons-dired-mode))
 
-(global-set-key (kbd "C-x !") 'delete-other-windows-vertically)
-
 (progn
   (setq dired-dwim-target t)
-  (setq dired-listing-switches "-al --dired --group-directories-first -h")
-  (global-set-key (kbd "C-c d") '("dired" . dired))
-  (q/ensure-package 'dired-single)
-  (require 'dired-single)
-  (define-key dired-mode-map (kbd "h") 'dired-single-up-directory)
-  (define-key dired-mode-map (kbd "l") 'dired-single-buffer))
+  (setq dired-listing-switches "-al --dired --group-directories-first -h"))
 
 (setq calendar-latitude 54.99244)
 (setq calendar-longitude 73.36859)
