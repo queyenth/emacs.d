@@ -63,7 +63,7 @@
 (setopt package-install-upgrade-built-in t)
 (package-initialize)
 
-(when (not package-archive-contents)
+(unless package-archive-contents
   (package-refresh-contents))
 
 (defun q/ensure-package (package &optional url)
