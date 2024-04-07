@@ -34,6 +34,10 @@
   ;(set-face-attribute 'default nil :font "UbuntuMono Nerd Font" :height 110)
   ;(set-face-attribute 'default nil :font "AverageMono" :height 110)
   ;(set-face-attribute 'default nil :font "OverpassM Nerd Font" :height 100)
+  ;(set-face-attribute 'default nil :font "0xProto Nerd Font Mono" :height 100)
+  ;(set-face-attribute 'default nil :font "Agave Nerd Font Mono" :height 110)
+  ;(set-face-attribute 'default nil :font "VictorMono Nerd Font Mono Medium" :height 100)
+  ;(set-face-attribute 'default nil :font "CommitMono Nerd Font" :height 100)
 
   (set-face-attribute 'default nil :font "IBM Plex Mono Text" :height 100)
 
