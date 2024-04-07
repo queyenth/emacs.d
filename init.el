@@ -432,14 +432,15 @@
 (q/ensure-package 'password-store)
 (auth-source-pass-enable)
 (global-set-key (kbd "C-c y y") '("copy" . password-store-copy))
-(global-set-key (kbd "C-c y p") '("insert" . password-store-insert))
+(global-set-key (kbd "C-c y i") '("insert" . password-store-insert))
 (global-set-key (kbd "C-c y e") '("insert" . password-store-edit))
 
-(global-set-key (kbd "C-c m m") '("run some command" . q/magento))
-(global-set-key (kbd "C-c m c") '("clear cache" . q/magento-clear-cache))
-(global-set-key (kbd "C-c m s") '("static content deploy" . q/magento-static-content-deploy))
-(global-set-key (kbd "C-c m d") '("DI compile" . q/magento-di-compile))
-(global-set-key (kbd "C-c m u") '("setup upgrade" . q/magento-setup-upgrade))
+(with-eval-after-load 'php-mode
+  (keymap-set php-mode-map "C-c C-m m" '("run some command" . q/magento))
+  (keymap-set php-mode-map "C-c C-m c" '("clear cache" . q/magento-clear-cache))
+  (keymap-set php-mode-map "C-c C-m s" '("static content deploy" . q/magento-static-content-deploy))
+  (keymap-set php-mode-map "C-c C-m d" '("DI compile" . q/magento-di-compile))
+  (keymap-set php-mode-map "C-c C-m u" '("setup upgrade" . q/magento-setup-upgrade)))
 
 (progn
   (q/ensure-package 'consult))
