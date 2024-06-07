@@ -59,7 +59,6 @@
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/"))
 
-(setq package-enable-at-startup nil)
 (setopt package-install-upgrade-built-in t)
 (package-initialize)
 
