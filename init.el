@@ -1,58 +1,70 @@
 ;; -*- lexical-binding: t -*-
 (setq user-full-name "Queyenth")
-(setq user-mail-address "q@queyenth.xyz")
+(setq user-mail-address "queyenth@gmail.com")
+
+(add-to-list 'load-path (concat user-emacs-directory "custom"))
+
+(use-package emenu
+  :commands (emenu-window-switch emenu-application-launcher))
+
+(use-package qrem
+  :commands (q/rem-reminder q/rem-show q/rem-count emenu-reminder)
+  :init
+  (keymap-global-set "C-c R" #'q/rem-reminder))
+
+(use-package modeline
+  :config
+  ;; (q/modeline-subtle-mode 1)
+  (q/mode-line-set-folder-cut-each 3)
+  (q/mode-line-set-folder-count 3))
+
+(use-package jumplist
+  :disabled
+  :config
+  (q/jumplist-mode 1)
+  (defvar-keymap jumplist-repeat-keymap
+    :repeat (:exit (q/jumplist-clear q/jumplist-consult))
+    "j" #'q/jumplist-consult
+    "i" #'q/jumplist-next
+    "o" #'q/jumplist-prev
+    "c" #'q/jumplist-clear)
+  (keymap-global-set "C-c j" jumplist-repeat-keymap))
+
+(register-input-method
+ "jcuken-on-canary" "Russian" 'quail-use-package
+ "Ф" "ЙЦУКЕН For canary layout"
+ "canary")
+(setq default-input-method "jcuken-on-canary")
+
+(setq epg-pinentry-mode 'loopback)
 
 (setq native-comp-jit-compilation t)
 
-(when (boundp 'x-mod3-keysym) (setopt x-mod3-keysym 'hyper))
-
-(keymap-global-set "H-n" #'windmove-down)
-(keymap-global-set "H-m" #'windmove-left)
-(keymap-global-set "H-e" #'windmove-up)
-(keymap-global-set "H-i" #'windmove-right)
-(keymap-global-set "H-N" #'windmove-swap-states-down)
-(keymap-global-set "H-M" #'windmove-swap-states-left)
-(keymap-global-set "H-E" #'windmove-swap-states-up)
-(keymap-global-set "H-I" #'windmove-swap-states-right)
-(keymap-global-set "H-f" #'find-file)
-(keymap-global-set "H-b" #'switch-to-buffer)
-(keymap-global-set "H-B" #'switch-to-buffer-other-window)
-(keymap-global-set "H-d" #'dired)
-(keymap-global-set "H-j" #'dired-jump)
-(keymap-global-set "H-J" #'dired-jump-other-window)
-(keymap-global-set "H-v" #'magit)
-
 (defun q/after-frame (&optional _)
-  ;(set-face-attribute 'default nil :font "Iosevka Nerd Font" :height 110)
-  ;(set-face-attribute 'default nil :font "Iosevka Comfy" :height 110)
-
-  ;(set-face-attribute 'default nil :font "CaskaydiaCove Nerd Font" :height 110)
-  ;(set-face-attribute 'default nil :font "Monoid Nerd Font" :height 100)
-  ;(set-face-attribute 'default nil :font "Hack Nerd Font" :height 100)
-  ;(set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 100)
-  ;(set-face-attribute 'default nil :font "Inconsolata Nerd Font" :height 110)
-  ;(set-face-attribute 'default nil :font "UbuntuMono Nerd Font" :height 110)
-  ;(set-face-attribute 'default nil :font "AverageMono" :height 110)
-  ;(set-face-attribute 'default nil :font "OverpassM Nerd Font" :height 100)
-  ;(set-face-attribute 'default nil :font "0xProto Nerd Font Mono" :height 100)
-  ;(set-face-attribute 'default nil :font "Agave Nerd Font Mono" :height 110)
-  ;(set-face-attribute 'default nil :font "VictorMono Nerd Font Mono Medium" :height 100)
-  ;(set-face-attribute 'default nil :font "CommitMono Nerd Font" :height 100)
-
-  (set-face-attribute 'default nil :font "IBM Plex Mono Text" :height 100)
-
-  ;This is the same as IBM Plex Mono (I think, but I can spot
-  ;something a biiiiiit different, or I'm imagining things) but with
-  ;icons and stuff
-  ;(set-face-attribute 'default nil :font "BlexMono Nerd Font" :height 100)
-
-  ;(set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :height 110)
+  (set-face-attribute 'default nil :font "IBM Plex Mono" :height 100 :weight 'regular)
+  (set-face-attribute 'fixed-pitch nil :font "IBM Plex Mono" :height 100 :weight 'regular)
+  ;; (set-face-attribute 'default nil :font "Iosevka Comfy Motion" :height 110 :weight 'regular)
   (set-face-attribute 'variable-pitch nil :font "IBM Plex Sans Text"))
 
+(q/after-frame)
 (add-hook 'after-make-frame-functions #'q/after-frame)
 
-(set-frame-parameter (selected-frame) 'alpha '(100 . 100))
-(add-to-list 'default-frame-alist '(alpha . (100 . 100)))
+(setq default-frame-alist '((alpha . (100 . 100))
+                            (min-height . 1)
+                            (height . 45)
+                            (min-width . 1)
+                            (width . 81)
+                            (vertical-scroll-bars . nil)
+                            (internal-border-width . 12)
+                            (left-fringe . 0)
+                            (right-fringe . 0)
+                            (tool-bar-lines . 0)
+                            (menu-bar-lines . 0)))
+
+;; (setq window-divider-default-right-width 3)
+;; (setq window-divider-default-bottom-width 3)
+;; (setq window-divider-default-places t)
+;; (window-divider-mode)
 
 (require 'package)
 
@@ -65,25 +77,23 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-(defun q/ensure-package (package &optional url)
-  (unless (package-installed-p package)
-    (if url (package-vc-install url)
-      (package-install package))))
-
 (setq custom-file (concat user-emacs-directory "emacs-custom.el"))
 (when (file-exists-p custom-file)
   (load custom-file))
 
-(add-to-list 'load-path (concat user-emacs-directory "custom"))
-
 (setenv "UID" (string-trim (shell-command-to-string "id -u")))
 
-(fset 'yes-or-no-p 'y-or-n-p)
+(setopt use-short-answers t)
 (setq create-lockfiles nil)
 (save-place-mode)
 (setq save-place-file (concat user-emacs-directory "places"))
 (setq backup-directory-alist `(("." .,(concat user-emacs-directory "backups"))))
 (setq enable-recursive-minibuffers t)
+;; (setopt undo-no-redo nil)
+
+(use-package winner
+  :init
+  (winner-mode))
 
 (setq sentence-end-double-space nil)
 (setq require-final-newline t)
@@ -93,17 +103,20 @@
 (setq
  apropos-do-all t
  mouse-yank-at-point t)
-(setq-default cursor-type 'bar)
+(setq-default cursor-type 'box)
 (setq ring-bell-function 'ignore)
 
 (column-number-mode)
 (show-paren-mode 1)
 
-(progn
+(use-package savehist
+  :init
   (setq history-length 500)
   (setq history-delete-duplicates t)
   (setq savehist-additional-variables '(register-alist kill-ring))
   (savehist-mode))
+
+(recentf-mode)
 
 (auto-save-visited-mode)
 (global-auto-revert-mode)
@@ -122,41 +135,55 @@
   (tooltip-mode -1))
 (set-fringe-mode 0)
 
-(blink-cursor-mode 0)
+(setq mouse-autoselect-window t)
+(setq mouse-drag-and-drop-region t)
+(setq mouse-drag-and-drop-region-cross-program t)
+(setq dired-mouse-drag-files t)
 
-(progn
-  (q/ensure-package 'minions)
-  (setq minions-prominent-modes '(wc-goal-mode meow-normal-mode meow-insert-mode meow-beacon-mode meow-keypad-mode meow-motion-mode))
-  (minions-mode 1))
-
-(progn
-  (q/ensure-package 'which-key)
+(use-package which-key
+  :disabled
+  :config
   (which-key-mode))
 
-(progn
-  (q/ensure-package 'rainbow-delimiters)
-  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
 
-(progn
+(use-package ansi-color
+  :init
   (defun q/colorize-compilation-buffer ()
     (when (eq major-mode 'compilation-mode)
       (ansi-color-apply-on-region compilation-filter-start (point-max))))
-  (add-hook 'compilation-filter-hook #'q/colorize-compilation-buffer)
-  (setq compilation-scroll-output t))
+  :hook (compilation-filter . q/colorize-compilation-buffer))
 
-(progn
+(setq compilation-scroll-output t)
+
+(use-package display-line-numbers
+  :init
   (setq display-line-numbers-type t)
-  (add-hook 'prog-mode-hook #'display-line-numbers-mode))
+  :hook (prog-mode . display-line-numbers-mode))
 
-(progn
-  (q/ensure-package 'ef-themes)
-  (q/ensure-package 'almost-mono-themes)
-  (mapc #'disable-theme custom-enabled-themes)
+(use-package ef-themes
+  :config
   (load-theme 'ef-day :no-confirm))
 
+(use-package almost-mono-themes
+  :disabled
+  :config
+  (load-theme 'almost-mono-cream :no-confirm))
+
+(use-package all-the-icons
+  :config
+  (use-package all-the-icons-dired
+    :hook (dired-mode . all-the-icons-dired-mode)))
+
+(use-package ediff
+  :init
+  (setq ediff-split-window-function 'split-window-horizontally)
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain))
+
 (progn
-  (q/ensure-package 'all-the-icons)
-  (require 'all-the-icons))
+  (setq dired-dwim-target t)
+  (setq dired-listing-switches "-al --dired --group-directories-first -h"))
 
 (setq custom-tab-width 4)
 (setq tab-width 4)
@@ -166,14 +193,6 @@
 (setq tab-always-indent 'complete)
 
 (setq backward-delete-char-untabify-method 'hungry)
-
-(progn
-  (q/ensure-package 'all-the-icons-dired)
-  (add-hook 'dired-mode-hook #'all-the-icons-dired-mode))
-
-(progn
-  (setq dired-dwim-target t)
-  (setq dired-listing-switches "-al --dired --group-directories-first -h"))
 
 (setq calendar-latitude 54.99244)
 (setq calendar-longitude 73.36859)
@@ -198,8 +217,20 @@
 (defun q/get-org-file (file)
   (concat q/org-directory file))
 
-(progn
-  (q/ensure-package 'org)
+(use-package org
+  :defer t
+  :bind (("C-c o a" . org-agenda)
+         ("C-c o c" . org-capture)
+         ("C-c o p" . yank-media)
+         ("C-c o s" . org-save-all-org-buffers)
+         ("C-c o z" . org-revert-all-org-buffers)
+         ("C-c o t i" . org-clock-in)
+         ("C-c o t o" . org-clock-out)
+         ("C-c o t g" . org-clock-goto))
+  :hook ((org-mode . variable-pitch-mode)
+         (org-mode . visual-line-mode))
+  :init
+  (setq org-clock-clocked-in-display nil)
   (setq org-log-into-drawer t)
   (setq org-log-reschedule 'note)
   (setq org-refile-allow-creating-parent-nodes 'confirm)
@@ -207,9 +238,9 @@
   (setq org-outline-path-complete-in-steps nil)
   (setq org-indent-indentation-per-level 1)
   (setq org-adapt-indentation nil)
-  (setq org-hide-leading-stars nil)
-  (setq org-hide-emphasis-markers nil)
-  (setq org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
+  (setq org-hide-leading-stars t)
+  (setq org-hide-emphasis-markers t)
+  ;; (setq org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
   (setq org-cycle-separator-lines 1)
   (setq org-startup-with-inline-images t)
   (setq org-directory q/org-directory)
@@ -224,29 +255,26 @@
   (setq org-return-follows-link t)
 
   (setq org-capture-templates
-        `(("t" "inbox task" entry (file ,(q/get-org-file "/inbox.org"))
-           (file ,(q/get-org-file "/tmpl/task")))
-          ("i" "idea" entry (file ,(q/get-org-file "/ideas.org"))
-           (file ,(q/get-org-file "/tmpl/idea")))
-          ("l" "link" entry (file ,(q/get-org-file "/inbox.org"))
-           (file ,(q/get-org-file "/tmpl/link")) :immediate-finish t)))
-
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (python . t)))
-
+        `(("t" "todo for today" entry
+           (file ,(q/get-org-file "/next.org"))
+           (file ,(q/get-org-file "/tmpl/todo")) :empty-lines 1)
+          ("b" "book" entry
+           (file ,(q/get-org-file "/books.org"))
+           (function q/org-capture-book-template) :empty-lines 1)
+          ("i" "inbox task" entry
+           (file ,(q/get-org-file "/inbox.org"))
+           (file ,(q/get-org-file "/tmpl/task")) :empty-lines 1)
+          ("n" "idea" entry
+           (file ,(q/get-org-file "/ideas.org"))
+           (file ,(q/get-org-file "/tmpl/idea")) :empty-lines 1)
+          ("l" "link" entry
+           (file ,(q/get-org-file "/inbox.org"))
+           (file ,(q/get-org-file "/tmpl/link")) :empty-lines 1 :immediate-finish t)
+          ("r" "region to clocked-in task" plain
+           (clock)
+           "%a\n%i" :empty-lines 1 :immediate-finish t)))
   (setq org-confirm-babel-evaluate nil)
   (setq org-src-tab-acts-natively t)
-  (require 'org-tempo)
-  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
-  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-  (add-to-list 'org-structure-template-alist '("py" . "src python")))
-
-(with-eval-after-load 'org
-  (org-crypt-use-before-save-magic))
-
-(progn
   (setq q/org-agenda-todo-view
         `(("A" "Agenda"
            ((agenda ""
@@ -264,82 +292,86 @@
                    (org-agenda-files `(,(q/get-org-file "/next.org")
                                        ,(q/get-org-file "/projects.org")))))
             nil))))
-  (setq org-agenda-custom-commands `,q/org-agenda-todo-view)
+  (setq org-agenda-custom-commands q/org-agenda-todo-view)
   (setq org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t%-6e% s")
                                    (todo . " %i %-12:c %-6e")
                                    (tags . " %i %-12:c")
                                    (search . " %i %-12:c")))
+  :config
+  (custom-set-faces
+   '(org-block ((t (:inherit fixed-pitch))))
+   '(org-code ((t (:inherit (shadow fixed-pitch)))))
+   '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
+   '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
+   '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+   '(org-table ((t (:inherit fixed-pitch))))
+   '(org-property-value ((t (:inherit fixed-pitch))) t))
+  (setq q/org-languages '(("sh" . "shell")
+                          ("py" . "python")
+                          ("el" . "emacs-lisp")
+                          ("php" . "php")))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   (mapcar (lambda (x) (cons (intern (cdr x)) t)) q/org-languages))
+  (require 'org-tempo)
+  (dolist (x q/org-languages)
+    (add-to-list 'org-structure-template-alist `(,(car x) . ,(format "src %s" (cdr x)))))
+  (org-crypt-use-before-save-magic)
   (advice-add 'org-refile :after
               (lambda (&rest _)
-                (org-save-all-org-buffers))))
+                (org-save-all-org-buffers)))
 
-(progn
-  (q/ensure-package 'org-drill)
-  (setq org-drill-add-random-noise-to-intervals-p t)
-  (setq org-drill-learn-fraction 0.25)
-  (setq org-drill-hint-separator "||")
-  (setq org-drill-left-cloze-delimiter "<[")
-  (setq org-drill-right-cloze-delimiter "]>"))
+  (use-package org-drill
+    :bind ("C-c o d" . org-drill)
+    :config
+    (setq org-drill-add-random-noise-to-intervals-p t
+          org-drill-learn-fraction 0.25
+          org-drill-hint-separator "||"
+          org-drill-left-cloze-delimiter "<["
+          org-drill-right-cloze-delimiter "]>"))
+  (use-package org-cliplink :defer t)
+  (use-package org-toggl
+    :commands org-toggl-integration-mode
+    :config
+    (use-package request)
+    (setq org-toggl-inherit-toggl-properties t)))
 
-(progn
-  (q/ensure-package 'org-download)
-  (require 'org-download))
-(q/ensure-package 'org-cliplink)
-
-(global-set-key (kbd "C-c o a") '("agenda" . org-agenda))
-(global-set-key (kbd "C-c o c") '("capture" . org-capture))
-(global-set-key (kbd "C-c o d") '("drill" . org-drill))
-(global-set-key (kbd "C-c o p") '("clipboard image" . org-download-clipboard))
-(global-set-key (kbd "C-c o s") '("save all org buffers" . org-save-all-org-buffers))
-(global-set-key (kbd "C-c o z") '("revert all org buffers" . org-revert-all-org-buffers))
-
-(global-set-key (kbd "C-c o t i") '("clock in" . org-clock-in))
-(global-set-key (kbd "C-c o t o") '("clock out" . org-clock-out))
-(global-set-key (kbd "C-c o t g") '("clock go to" . org-clock-goto))
-
-(progn
-  (setq org-toggl-inherit-toggl-properties t)
-  (with-eval-after-load 'org
-    (q/ensure-package 'request)
-    (require 'org-toggl)
-    (org-toggl-integration-mode)))
-
-(progn
-  (q/ensure-package 'vertico)
+(use-package vertico
+  :init
   (setq vertico-cycle t)
   (vertico-mode))
 
-(progn
-  (q/ensure-package 'orderless)
-  (require 'orderless)
+(use-package orderless
+  :config
+  (defun q/toggle-kwd-orderless ()
+    (interactive)
+    (if (memq #'orderless-kwd-dispatch orderless-style-dispatchers)
+        (setq orderless-style-dispatchers (remove #'orderless-kwd-dispatch orderless-style-dispatchers))
+      (add-to-list 'orderless-style-dispatchers #'orderless-kwd-dispatch)))
   (setq completion-styles '(orderless basic)
         completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+        completion-category-overrides '((file (styles partial-completion))))
+  (add-to-list 'orderless-style-dispatchers #'orderless-kwd-dispatch))
 
 (setq read-file-name-completion-ignore-case t
       read-buffer-completion-ignore-case t
       completion-ignore-case t)
 
-(progn
-  (q/ensure-package 'marginalia)
+(use-package marginalia
+  :config
   (marginalia-mode))
 
-(progn
-  (q/ensure-package 'embark)
-  (defun embark-act-noquit ()
-    "Run action but don't quit the minibuffer afterwards."
-    (interactive)
-    (let ((embark-quit-after-action nil))
-      (embark-act)))
-  (global-set-key (kbd "C-.") 'embark-act)
-  (global-set-key (kbd "C-,") 'embark-act-noquit)
-  (global-set-key (kbd "M-,") 'embark-dwim))
+(use-package embark
+  :bind (("C-." . embark-act)
+         ("C-h b" . embark-bindings))
+  :init
+  (setq prefix-help-command #'embark-prefix-help-command))
 
-(progn
-  (q/ensure-package 'popper)
-  (require 'popper)
-  (global-set-key (kbd "C-<escape>") 'popper-toggle-latest)
-  (global-set-key (kbd "M-<escape>") 'popper-cycle)
+(use-package popper
+  :disabled
+  :bind (("C-<escape>" . popper-toggle)
+         ("M-<escape>" . popper-cycle))
+  :config
   (setq popper-reference-buffers
         '(help-mode
           compilation-mode
@@ -348,56 +380,58 @@
   (popper-mode +1)
   (popper-echo-mode +1))
 
-(progn
-  (q/ensure-package 'project)
-  (define-key project-prefix-map "z" (lambda () (interactive) (project-find-file t)))
-  (global-set-key (kbd "C-c p") project-prefix-map))
+(use-package project
+  :defer t
+  :init
+  (keymap-global-set "C-c p" project-prefix-map)
+  :config
+  (keymap-set project-prefix-map "z" (lambda () (interactive) (project-find-file t))))
 
-(progn
-  (q/ensure-package 'rg)
-  (with-eval-after-load 'project
-    (define-key project-prefix-map "s" #'rg-project)))
+(use-package rg
+  :after project
+  :config
+  (keymap-set project-prefix-map "s" #'rg-project))
 
 (setq xref-search-program 'ripgrep)
 
-(progn
-  (q/ensure-package 'magit)
-  (global-set-key (kbd "C-c g") '("magit" . magit-status))
-
-  (defun q/magit-my-branch-spin-off (branch &optional from)
-    (interactive (list (magit-read-string-ns "Spin off branch" (format "feature/%s" (car (split-string org-clock-heading))))
-                       (car (last (magit-region-values 'commit)))))
-    (magit-branch-spinoff branch from))
-  (global-set-key (kbd "C-c S") '("spinoff" . q/magit-my-branch-spin-off))
-
+(use-package magit
+  :bind (("C-c g" . magit-status)
+         :map project-prefix-map
+         ("m" . magit-project-status))
+  :init
   (with-eval-after-load 'project
-    (define-key project-prefix-map "m" #'magit-project-status)
-    (add-to-list 'project-switch-commands '(magit-project-status "Magit"))))
-
-(add-hook 'prog-mode-hook #'electric-pair-mode)
-
-(progn
-  (q/ensure-package 'docker)
-  (defun q/kill-all-exec-buffers ()
+    (add-to-list 'project-switch-commands '(magit-project-status "Magit")))
+  (with-eval-after-load 'embark
+    (add-to-list 'embark-multitarget-actions #'magit-stage-file))
+  (defun q/magit-my-branch-spin-off ()
     (interactive)
-    (kill-matching-buffers "\* docker-compose exec" nil t)))
+    (let ((clock-heading (string-replace " " "_" org-clock-heading)))
+      (magit-branch-spinoff (magit-read-string-ns "Spin off branch" (format "feature/%s" clock-heading)))))
+  :config
+  (transient-replace-suffix 'magit-commit 'magit-commit-autofixup
+    '("x" "Absorb changes" magit-commit-absorb)))
+
+(use-package elec-pair
+  :hook (prog-mode . electric-pair-mode))
+
+(defun q/kill-all-exec-buffers ()
+  (interactive)
+  (kill-matching-buffers "\* docker-compose exec" nil t))
+
+(use-package docker :defer t)
 
 (defun q/magento-get-namespace-path ()
   (let* ((file-path (file-name-directory (or (buffer-file-name)
-                                             (buffer-name (current-buffer)))))
-          (namespace (string-replace "/" "\\" (and (string-match ".*/app/code/\\(.*\\)/" file-path)
-                                              (match-string 1 file-path)))))
-    namespace))
+                                             (buffer-name (current-buffer))))))
+    (string-replace "/" "\\" (and (string-match ".*/app/code/\\(.*\\)/" file-path)
+                                  (match-string 1 file-path)))))
 
 (define-skeleton q/skel-magento-namespace
   "Inserts a namespace for current file."
   nil
   "namespace " (q/magento-get-namespace-path) ";\n")
 
-(q/ensure-package 'web-mode)
-(progn
-  (q/ensure-package 'php-mode)
-  (q/ensure-package 'php-ts-mode "https://github.com/emacs-php/php-ts-mode"))
+(use-package web-mode :defer t)
 
 (defun q/magento (command)
   (interactive (list
@@ -423,30 +457,56 @@
 
 (setq nxml-child-indent 4)
 
-(add-hook 'typescript-ts-mode-hook #'eglot-ensure)
+(use-package password-store
+  :bind (("C-c y y" . password-store-copy)
+         ("C-c y i" . password-store-insert)
+         ("C-c y e" . password-store-edit))
+  :init
+  (auth-source-pass-enable)
+  (defun emenu-pass ()
+    (interactive)
+    (emenu (call-interactively #'password-store-copy))))
 
-(progn
-  (q/ensure-package 'pinentry)
-  (pinentry-start))
+(use-package password-store-otp
+  :after password-store
+  :commands password-store-otp-token-copy
+  :init
+  (define-advice password-store--save-field-in-kill-ring
+      (:around (oldfn entry secret field) q/password-store-otp-or-pass)
+    "Get OTP token if it's otpauth url."
+    (if (string-prefix-p "otpauth://" secret)
+        (password-store-otp-token-copy entry)
+      (funcall oldfn entry secret field))))
 
-(q/ensure-package 'password-store)
-(auth-source-pass-enable)
-(global-set-key (kbd "C-c y y") '("copy" . password-store-copy))
-(global-set-key (kbd "C-c y i") '("insert" . password-store-insert))
-(global-set-key (kbd "C-c y e") '("insert" . password-store-edit))
+(use-package php-mode
+  :defer t)
 
-(with-eval-after-load 'php-mode
-  (keymap-set php-mode-map "C-c C-m m" '("run some command" . q/magento))
-  (keymap-set php-mode-map "C-c C-m c" '("clear cache" . q/magento-clear-cache))
-  (keymap-set php-mode-map "C-c C-m s" '("static content deploy" . q/magento-static-content-deploy))
-  (keymap-set php-mode-map "C-c C-m d" '("DI compile" . q/magento-di-compile))
-  (keymap-set php-mode-map "C-c C-m u" '("setup upgrade" . q/magento-setup-upgrade)))
+(use-package php-ts-mode
+  :defer t
+  :init
+  (add-to-list 'major-mode-remap-alist '(php-mode . php-ts-mode)))
 
-(progn
-  (q/ensure-package 'consult))
+(use-package consult
+  :bind (("C-c b" . consult-buffer)
+         ("C-c B" . consult-buffer-other-window)
+         ("C-c S" . consult-ripgrep))
+  :init
+  (setq register-preview-function #'consult-register-format)
+  (with-eval-after-load 'project
+    (keymap-set project-prefix-map "C-b" #'consult-project-buffer)))
 
-(defun mask-text (start end mask-char)
-  "Overwrite the region with the selected mask character."
+(use-package embark-consult
+  :after (embark consult)
+  :config
+  (defun q/consult-embark-multi-line (buffers)
+    (interactive)
+    (consult-line-multi (list :include buffers)))
+  (add-to-list 'embark-multitarget-actions #'q/consult-embark-multi-line)
+  ;; Q because that's my favorite letter.
+  (keymap-set embark-consult-search-map "Q" #'q/consult-embark-multi-line))
+
+(defun q/mask-text (start end mask-char)
+  "Overwrite the region (START to END) with the selected MASK-CHAR character."
   (interactive "@*r\ncMasking character: ")
   (let ((region-length (- end start))
         (original-point (point)))
@@ -455,24 +515,53 @@
     (insert-char mask-char region-length)
     (goto-char original-point)))
 
-(progn
-  (q/ensure-package 'surround)
-  (require 'surround))
+(use-package surround
+  :config
+  (defmacro q/surround-insert (char)
+    "Just a wrapper to use in keymap. I'm not sure I need this, but idk."
+    `(lambda ()
+       (interactive)
+       (surround-insert ,char)))
 
-(q/ensure-package 'drag-stuff)
+  (defmacro q/surround-change (char)
+    "Just a wrapper to use in keymap. I'm not sure I need this, but idk."
+    `(lambda (with)
+       (interactive (list (char-to-string (read-char "with: "))))
+       (surround-change ,char with)))
 
-(setopt undo-no-redo t)
+  (defvar-keymap q/surround-keymap
+    "(" (q/surround-insert "(")
+    "{" (q/surround-insert "{")
+    "[" (q/surround-insert "[")
+    "<" (q/surround-insert "<")
+    "'" (q/surround-insert "'")
+    "\"" (q/surround-insert "\"")
+    ")" (q/surround-change "(")
+    "}" (q/surround-change "{")
+    "]" (q/surround-change "[")
+    ">" (q/surround-change "<")
+    "i" #'surround-kill-inner
+    "o" #'surround-kill-outer
+    "d" #'surround-delete
+    "m" #'surround-mark-inner
+    "M" #'surround-mark-outer
+    "C-'" (q/surround-change "'")
+    "C-\"" (q/surround-change "\""))
+  (keymap-global-set "C-c s" q/surround-keymap))
 
-(repeat-mode)
+(use-package repeat
+  :init
+  (repeat-mode))
 
-(defvar-keymap drag-stuff-repeat-map
-  :repeat t
-  "n" #'drag-stuff-down
-  "e" #'drag-stuff-up
-  "i" #'drag-stuff-right
-  "m" #'drag-stuff-left)
-
-(keymap-set global-map "C-c d" drag-stuff-repeat-map)
+(use-package drag-stuff
+  :defer 1
+  :bind ((:repeat-map drag-stuff-repeat-map
+                      ("n" . drag-stuff-down)
+                      ("e" . drag-stuff-up)
+                      ("i" . drag-stuff-right)
+                      ("m" . drag-stuff-left)))
+  :config
+  (keymap-global-set "C-c d" drag-stuff-repeat-map))
 
 (defvar-keymap windmove-repeat-map
   :repeat (:exit (balance-windows delete-other-windows delete-other-windows-vertically follow-delete-other-windows-and-split clone-indirect-buffer split-window-below split-window-right))
@@ -486,29 +575,188 @@
   "M" #'windmove-swap-states-left
   "=" #'balance-windows
   "d" #'delete-other-windows
-  "v" #'delete-other-windows-vertically
+  "!" #'delete-other-windows-vertically
   "-" #'split-window-below
   "|" #'split-window-right
+  "v" #'windmove-display-down
+  "h" #'windmove-display-right
   "f" #'follow-delete-other-windows-and-split
   "c" #'clone-indirect-buffer)
 
-(keymap-set global-map "C-c w" windmove-repeat-map)
+(keymap-global-set "C-c w" windmove-repeat-map)
 
-(progn
-  (q/ensure-package 'meow)
-  (defmacro q/meow-call-negative (form)
-    `(let ((current-prefix-arg -1))
+(keymap-global-set "C-c q" #'quit-window)
+(keymap-global-set "C-c f" #'find-file)
+(keymap-global-set "C-c F" #'find-file-other-window)
+(keymap-global-set "C-c k" #'kill-current-buffer)
+(keymap-global-set "C-c v" #'magit)
+(keymap-global-set "C-c V" #'magit-find-file-other-window)
+
+(defvar-keymap q/mark-map
+  "p" #'mark-paragraph
+  "b" #'mark-whole-buffer
+  "w" #'mark-word
+  "d" #'mark-defun
+  "f" #'mark-sexp)
+(keymap-global-set "C-c m" q/mark-map)
+
+(defvar-keymap q/transpose-map
+  "p" #'transpose-paragraphs
+  "c" #'transpose-chars
+  "w" #'transpose-words
+  "l" #'transpose-lines
+  "f" #'transpose-sexps)
+(keymap-global-set "C-c t" q/transpose-map)
+
+(use-package register
+  :init
+  (defun q/register-dwim ()
+    "If region active, copy region to register, otherwise save the point."
+    (interactive)
+    (if (region-active-p)
+        (call-interactively #'copy-to-register)
+      (call-interactively #'point-to-register)))
+
+  (defmacro q/register-macro (pred func)
+    "Return a lambda that filters REGISTER-ALIST by PRED before calling FUNC."
+    `(lambda ()
+       (interactive)
+       (let ((register-alist (seq-filter (lambda (x) (,pred (cdr x))) register-alist)))
+         (call-interactively ,func))))
+
+  (defvar-keymap q/register-map
+    "'" #'q/register-dwim
+    "i" (q/register-macro stringp #'insert-register)
+    "j" (q/register-macro markerp #'jump-to-register))
+
+  (setopt register-preview-delay 0)
+  (keymap-global-set "C-c r" q/register-map))
+
+(use-package ace-window
+  :bind (("M-o" . ace-window)))
+
+(use-package avy
+  :bind (("C-z" . avy-goto-char-timer))
+  :config
+  (keymap-set isearch-mode-map "C-z" #'avy-isearch)
+
+  (defun q/avy-activate-mark (pt)
+    "Activate a mark and then jump to PT."
+    (activate-mark)
+    (goto-char pt))
+  (setf (alist-get ?  avy-dispatch-alist) #'q/avy-activate-mark)
+
+  (defun q/avy-embark-act (pt)
+    "Embark Act on a thing at PT."
+    (unwind-protect
+        (save-excursion
+          (goto-char pt)
+          (embark-act))
+      (select-window
+       (cdr (ring-ref avy-ring 0))))
+    t)
+  (setf (alist-get ?. avy-dispatch-alist) #'q/avy-embark-act)
+
+  (defun q/avy-refactor (pt)
+    "Replace sexp at PT with a symbol before current point, then paste
+the sexp at current point."
+    (unwind-protect
+        ;; Not a cute code, but saves a variable, I guess.
+        (when (save-excursion
+                (forward-symbol -1)
+                (when-let ((symb (thing-at-point 'symbol)))
+                  (goto-char pt)
+                  (kill-sexp)
+                  (insert symb)
+                  t))
+          (yank))
+      (select-window
+       (cdr (ring-ref avy-ring 0))))
+    t)
+  (setf (alist-get ?r avy-dispatch-alist) #'q/avy-refactor))
+
+(use-package treesit
+  :ensure nil
+  :init
+  (setq treesit-language-source-alist '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+                                        (cmake "https://github.com/tree-sitter/tree-sitter-bash")
+                                        (css "https://github.com/tree-sitter/tree-sitter-css")
+                                        (go "https://github.com/tree-sitter/tree-sitter-go")
+                                        (html "https://github.com/tree-sitter/tree-sitter-html")
+                                        (php "https://github.com/tree-sitter/tree-sitter-php" "v0.21.1" "php/src")
+                                        (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+                                        (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+                                        (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+                                        (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+                                        (yaml "https://github.com/ikatyang/tree-sitter-yaml")
+                                        (json "https://github.com/tree-sitter/tree-sitter-json")
+                                        (make "https://github.com/alemuller/tree-sitter-make")
+                                        (python "https://github.com/tree-sitter/tree-sitter-python"))))
+
+
+(use-package puni
+  :bind (("C-c (" . puni-slurp-forward)
+         ("C-c )" . puni-slurp-backward)
+         ("C-c }" . puni-barf-forward)
+         ("C-c {" . puni-barf-backward)
+         ("C-(" . puni-slurp-forward)
+         ("C-)" . puni-slurp-backward)
+         ("C-}" . puni-barf-forward)
+         ("C-{" . puni-barf-backward))
+  :init
+  (puni-global-mode)
+  (add-hook 'term-mode-hook #'puni-disable-puni-mode)
+  (keymap-set q/transpose-map "f" #'puni-transpose))
+
+;; https://karthinks.com/software/a-consistent-structural-editing-interface/
+;; (defvar-keymap structural-edit-map
+;;   :repeat t
+;;   "u" #'backward-up-list
+;;   "d" #'down-list
+;;   "f" #'forward-sexp
+;;   "b" #'backward-sexp
+;;   "K" #'kill-sexp
+;;   "/" #'undo
+
+;;   "n" #'puni-forward-sexp
+;;   "p" #'puni-backward-sexp
+;;   "k" #'puni-kill-line
+;;   "(" #'puni-slurp-backward
+;;   ")" #'puni-slurp-forward
+;;   "{" #'puni-barf-backward
+;;   "}" #'puni-barf-forward
+;;   "s" #'puni-split
+;;   "S" #'puni-squeeze
+;;   "R" #'puni-raise
+;;   "U" #'puni-splice
+;;   "t" #'puni-transpose
+;;   "x" #'eval-defun)
+
+(defun q/narrow-region-toggle (start end)
+  "Narrow from START to END or widen if narrowed."
+  (interactive "r")
+  (if (buffer-narrowed-p)
+      (progn
+        (widen)
+        (recenter))
+    (narrow-to-region start end)
+    (deactivate-mark)))
+
+(use-package meow
+  :defer 1
+  :init
+  (defmacro q/call-interactive-with (prefix form)
+    `(let ((current-prefix-arg ,prefix))
        (call-interactively ,form)))
   (defun q/meow-negative-find ()
     (interactive)
-    (q/meow-call-negative 'meow-find))
+    (q/call-interactive-with -1 'meow-find))
   (defun q/meow-negative-till ()
     (interactive)
-    (q/meow-call-negative 'meow-till))
+    (q/call-interactive-with -1 'meow-till))
   (defun q/meow-pop-mark ()
     (interactive)
-    (let ((current-prefix-arg 4))
-      (call-interactively 'set-mark-command)))
+    (q/call-interactive-with 4 'set-mark-command))
 
   (defconst meow-cheatsheet-layout-canary
     '((<TLDE> "`"	"~")
@@ -583,41 +831,8 @@
      '("8" . meow-digit-argument)
      '("9" . meow-digit-argument)
      '("0" . meow-digit-argument)
-     '("u" . meow-universal-argument)
      '("/" . meow-keypad-describe-key)
-     '("?" . meow-cheatsheet)
-
-     ; Move all of this to C-c bindings.
-     '("f" . find-file)
-     '("F" . find-file-other-window)
-     '("k" . kill-this-buffer)
-     '("b" . switch-to-buffer)
-     '("B" . switch-to-buffer-other-window)
-     '("j" . dired-jump)
-     '("J" . dired-jump-other-window)
-     '("v" . magit)
-     '("V" . magit-find-file-other-window)
-     '("%" . query-replace)
-
-     '("s p" . mark-paragraph)
-     '("s w" . mark-word)
-     '("s d" . mark-defun)
-     '("s f" . mark-sexp)
-
-     '("t p" . transpose-paragraphs)
-     '("t c" . transpose-chars)
-     '("t w" . transpose-words)
-     '("t l" . transpose-lines)
-     '("t f" . transpose-sexps)
-
-     '("," . xref-pop-marker-stack)
-     '("." . xref-find-definitions)
-
-     '("'" . point-to-register)
-     '("\"" . jump-to-register)
-
-     '(";" . copy-to-register)
-     '(":" . insert-register))
+     '("?" . meow-cheatsheet))
 
     (meow-normal-define-key
      '("0" . meow-expand-0)
@@ -631,19 +846,13 @@
      '("2" . meow-expand-2)
      '("1" . meow-expand-1)
      '("-" . negative-argument)
-     (cons "_" surround-keymap)
      '(";" . meow-reverse)
-     '(":" . execute-extended-command)
      '("," . meow-inner-of-thing)
      '("." . meow-bounds-of-thing)
      '("(" . meow-beginning-of-thing)
      '(")" . meow-end-of-thing)
-     '("C-(" . (lambda () (interactive) (surround-insert "(")))
-     '("M-(" . (lambda (new) (interactive (list (char-to-string (read-char "replace ")))) (surround-change "(" new)))
      '("{" . backward-paragraph)
      '("}" . forward-paragraph)
-     '("C-{" . (lambda () (interactive) (surround-insert "{")))
-     '("M-{" . (lambda (new) (interactive (list (char-to-string (read-char "replace ")))) (surround-change "{" new)))
      '("[" . backward-sexp)
      '("]" . forward-sexp)
      '("a" . meow-append)
@@ -651,7 +860,7 @@
      '("b" . meow-back-word)
      '("B" . meow-back-symbol)
      '("c" . meow-change)
-     ;'("C" . ignore)
+     '("C" . q/transpose-map)
      '("d" . meow-kill)
      '("D" . meow-clipboard-kill)
      '("e" . meow-prev)
@@ -661,7 +870,7 @@
      '("g" . meow-cancel-selection)
      '("G" . meow-grab)
      '("h" . meow-search)
-     ;'("H" . ignore)
+     ;; '("H" . avy-goto-char-timer)
      '("i" . meow-right)
      '("I" . meow-right-expand)
      '("j" . meow-join)
@@ -669,7 +878,7 @@
      '("k" . meow-next-word)
      '("K" . meow-next-symbol)
      '("l" . meow-line)
-     '("L" . meow-goto-line)
+     ;; '("L" . consult-line-multi)
      '("m" . meow-left)
      '("M" . meow-left-expand)
      '("n" . meow-next)
@@ -681,7 +890,6 @@
      '("q" . meow-quit)
      '("Q" . consult-goto-line)
      '("r" . meow-replace)
-     '("C-r" . undo-redo)
      '("R" . meow-swap-grab)
      '("s" . meow-insert)
      '("S" . meow-open-above)
@@ -694,69 +902,102 @@
      '("w" . meow-mark-word)
      '("W" . meow-mark-symbol)
      '("x" . meow-delete)
-     '("X" . meow-backward-delete)
+     '("X" . kill-sexp)
      '("y" . meow-save)
      '("Y" . meow-sync-grab)
      '("z" . meow-pop-selection)
      '("Z" . q/meow-pop-mark)
-     '("'" . (lambda () (interactive) (surround-insert "'")))
-     '("\"" . (lambda () (interactive) (surround-insert "\"")))
-     '("C-'" . (lambda (new) (interactive (list (char-to-string (read-char "replace ")))) (surround-change "'" new)))
-     '("C-\"" . (lambda (new) (interactive (list (char-to-string (read-char "replace ")))) (surround-change "\"" new)))
      '("<" . beginning-of-defun)
      '(">" . end-of-defun)
      '("@" . backward-up-list)
-     '("#" . down-list)
+     '("$" . down-list)
+     '("#" . up-list)
      '("=" . meow-indent)
-     ;'("+" . ignore)
+     '("/" . consult-line)
      '("`" . downcase-dwim)
      '("~" . upcase-dwim)
-     '("/" . consult-line)
+     (cons "_" q/surround-keymap)
      '("?" . meow-comment)
      '("!" . repeat)
-     ;'("$" . ignore)
-     '("%" . exchange-point-and-mark)
+     ;; '(":" . execute-extended-command)
+     '("+" . puni-raise)
+     '("%" . puni-splice)
      '("^" . meow-back-to-indentation)
      '("&" . meow-clipboard-save)
-     '("C-*" . meow-start-kmacro-or-insert-counter)
-     '("*" . meow-end-or-call-kmacro)
+     (cons "*" q/mark-map)
+     (cons "'" q/register-map)
+     '("\"" . q/narrow-region-toggle)
+     '("<f5>" . recompile)
      '("<escape>" . ignore)))
-  (require 'meow)
+  :config
   (meow-setup)
   (meow-global-mode 1))
 
-(progn
-  (flymake-mode)
+(use-package meow-tree-sitter
+  :after meow
+  :config
+  (dolist (bind '((?a . "class")
+                  (?y . "entry")
+                  (?f . "function")
+                  (?t . "test")
+                  (?, . "parameter")
+                  (?/ . "comment")))
+    (meow-tree-sitter-register-thing (car bind) (cdr bind))))
+
+(use-package flymake
+  :hook (prog-mode . flymake-mode)
+  :config
   (defvar-keymap flymake-repeat-map
     :repeat (:exit (flymake-show-buffer-diagnostics))
     "n" #'flymake-goto-next-error
     "e" #'flymake-goto-prev-error
     "b" #'flymake-show-buffer-diagnostics)
-  (keymap-set global-map "C-c D" flymake-repeat-map))
+  (keymap-set global-map "C-c D" flymake-repeat-map)
+  (setq flymake-show-diagnostics-at-end-of-line nil))
 
-(progn
-  (q/ensure-package 'eglot)
+(defcustom lsp-intelephense-key ""
+  "Enter the intelephense key."
+  :type 'string
+  :group 'eglot)
+
+(use-package eglot
+  :defer t
+  :init
   (setq eglot-sync-connect nil)
   (setq eglot-events-buffer-size 0)
-  (defcustom lsp-intelephense-key ""
-    "Enter the intelephense key."
-    :type 'string
-    :group 'eglot)
-  (with-eval-after-load 'eglot
-    (add-to-list 'eglot-server-programs
-                 `((php-mode phps-mode php-ts-mode) . ("intelephense" "--stdio" :initializationOptions (:licenseKey ,lsp-intelephense-key))))))
+  :config
+  (add-to-list 'eglot-server-programs
+               `((php-mode php-ts-mode phps-mode) . ("intelephense" "--stdio" :initializationOptions (:licenseKey ,lsp-intelephense-key)))))
 
-(progn
-  (with-eval-after-load 'eglot
-    (add-to-list 'eglot-server-programs
-                 '((typescript-ts-mode) . ("typescript-language-server" "--stdio")))))
+;; Waiting for :vc keyword in use-package.
+;; https://sr.ht/~meow_king/peek/
+(use-package peek
+  :bind (("C-c P" . peek-overlay-dwim))
+  :config
+  (setq peek-overlay-window-size 10)
+  (setq peek-overlay-position 'above)
+  (setq peek-overlay-distance 5)
+  (setq peek-live-update t)
+  (global-peek-mode 1)
+  (keymap-set peek-mode-keymap "M-n" #'peek-next-line)
+  (keymap-set peek-mode-keymap "M-p" #'peek-prev-line))
 
-(progn
-  (q/ensure-package 'dape)
+(use-package copy-as-format
+  :defer t)
+
+(use-package typescript-ts-mode
+  :after eglot
+  :config
+  (add-to-list 'eglot-server-programs
+               '((typescript-ts-mode) . ("typescript-language-server" "--stdio"))))
+
+(use-package dape
+  :defer t
+  :init
   (setq dape-buffer-window-arrangement 'right))
 
-(progn
-  (q/ensure-package 'corfu)
+(use-package corfu
+  :init
   (setq completion-cycle-threshold 3)
   (setq corfu-cycle t)
   ;; (setq corfu-auto nil)
@@ -764,28 +1005,81 @@
   ;; (setq corfu-auto-prefix 4)
   (setq corfu-separator ?\s)
   (setq corfu-preview-current nil)
-  ;; (setq corfu-preselect-first nil)
-  (global-corfu-mode))
+  :config
+  (global-corfu-mode)
+  (with-eval-after-load 'cc-mode
+    (when (equal tab-always-indent 'complete)
+      (define-key c-mode-base-map [remap c-indent-line-or-region] #'indent-for-tab-command))))
 
-(progn
-  (q/ensure-package 'corfu-candidate-overlay)
+(use-package corfu-candidate-overlay
+  :after corfu
+  :config
   (corfu-candidate-overlay-mode))
 
-(progn
-  (q/ensure-package 'cape)
+(use-package cape
+  :defer t
+  :init
   (add-to-list 'completion-at-point-functions #'cape-file))
 
-(progn
-  (q/ensure-package 'ace-window)
-  (global-set-key (kbd "M-o") 'ace-window))
 
+(use-package mu4e
+  :load-path "/usr/share/emacs/site-lisp/mu4e/"
+  :bind ("C-c M" . mu4e)
+  :commands (mu4e mu4e--modeline-string)
+  :config
+  (require 'smtpmail)
+  (require 'mu4e-contrib)
+  (setq message-send-mail-function 'smtpmail-send-it)
+  (setq mail-user-agent 'mu4e-user-agent)
+  (setq mu4e-change-filenames-when-moving t)
+  ;; Fetch emails once an hour.
+  (setq mu4e-update-interval (* 60 60))
+  (setq mu4e-get-mail-command "mbsync -a")
+  (setq mu4e-maildir "~/mail")
+  (setq mu4e-use-fancy-chars t)
+
+  (setq mu4e-contexts
+        (list
+         (make-mu4e-context
+          :name "Gmail"
+          :match-func
+          (lambda (msg)
+            (when msg
+              (string-prefix-p "/gmail" (mu4e-message-field msg :maildir))))
+          :vars '((mu4e-drafts-folder . "/gmail/[Gmail]/Drafts")
+                  (mu4e-sent-folder . "/gmail/[Gmail]/Sent Mail")
+                  (mu4e-trash-folder . "/gmail/[Gmail]/Trash")
+                  (mu4e-sent-new-messages-behavior . delete)
+                  (smtpmail-smtp-server . "smtp.gmail.com")
+                  (smtpmail-smtp-user . "queyenth@gmail.com")
+                  (smtpmail-smtp-service . 587)
+                  (smtpmail-stream-type . starttls)))))
+
+  (setq mu4e-maildir-shortcuts
+        '(("/gmail/inbox" . ?i)
+          ("/gmail/[Gmail]/Drafts" . ?d)
+          ("/gmail/[Gmail]/Sent Mail" . ?s)
+          ("/gmail/[Gmail]/Starred" . ?x)
+          ("/gmail/[Gmail]/Trash" . ?t))))
+
+(setq
+ mailcap-download-directory "/tmp"
+ gnus-inhibit-images t
+ gnus-buttonized-mime-types '("multipart/alternative" "multipart/encrypted" "multipart/signed" ".*/signed" "text/x-org" "text/richtext" "text/enriched")
+ mm-html-inhibit-images t
+ mm-enable-external 'ask
+ mm-automatic-display '("text/plain")
+ mm-discouraged-alternatives '("text/html" "text/richtext" "text/enriched" "image/.*")
+ mm-inlined-types '("text/plain" "text/html")
+ mm-inline-media-tests `(("text/plain" mm-inline-text identity)
+                         ("text/html" mm-inline-text-html ,(lambda (_handle) mm-text-html-renderer))
+                         (".*" ignore identity)))
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 
-(progn
-  (q/ensure-package 'clojure-mode)
-  (q/ensure-package 'cider))
+(use-package clojure-mode :defer t)
+(use-package cider :defer t)
 
 (setq isearch-lazy-count t)
 (setq lazy-count-prefix-format "(%s/%s) ")
@@ -793,18 +1087,9 @@
 
 (setq search-whitespace-regexp ".*?")
 
-(load-file (concat user-emacs-directory "modeline.el"))
-(require 'modeline)
-(q/modeline-subtle-mode 1)
-(q/mode-line-set-folder-cut-each 3)
-(q/mode-line-set-folder-count 3)
-
 (define-abbrev text-mode-abbrev-table "qqn" "queyenth")
 (define-abbrev text-mode-abbrev-table "qqgit" "https://github.com/queyenth")
 (add-hook 'text-mode-hook #'abbrev-mode)
-(add-hook 'org-mode-hook #'variable-pitch-mode)
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
 
 (setopt diff-default-read-only t)
-
-(keymap-global-set "C-c c" #'compile)
-(keymap-global-set "C-c r" #'recompile)

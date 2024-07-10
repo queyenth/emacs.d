@@ -1,4 +1,13 @@
 ;; -*- lexical-binding: t -*-
+;; Basically prot's modeline
+(defgroup q/modeline nil
+  "Custom modeline."
+  :group 'mode-line)
+
+(defgroup q/modeline-faces nil
+  "Custom modeline faces."
+  :group 'q/modeline)
+
 (defun q/modeline-set-faces (_theme)
   "Make THEME mode lines subtle."
   (let ((subtle (face-foreground 'shadow)))
@@ -11,8 +20,6 @@
    '(mode-line (( )))
    '(mode-line-inactive (( )))))
 
-(face-attribute 'mode-line :background)
-
 (defun q/modeline--enable-mode ()
   (q/modeline-set-faces nil)
   (add-hook 'enable-theme-functions #'q/modeline-set-faces))
@@ -21,27 +28,21 @@
   (q/modeline-unset-faces)
   (remove-hook 'enable-theme-functions #'q/modeline-set-faces))
 
+;;;###autoload
 (define-minor-mode q/modeline-subtle-mode
   "Subtle mode."
+  :group 'q/modeline
   :global t
   (if q/modeline-subtle-mode
       (q/modeline--enable-mode)
     (q/modeline--disable-mode)))
 
-(defgroup q/modeline nil
-  "Custom modeline."
-  :group 'mode-line)
-
-(defgroup q/modeline-faces nil
-  "Custom modeline faces."
-  :group 'q/modeline)
-
 (defface q/modeline-indicator-blue-bg
   '((default :inherit bold)
     (((class color) (min-colors 88) (background light))
-     :background "#0000aa" :foreground "white")
+     :background "#375cc6" :foreground "white")
     (((class color) (min-colors 88) (background dark))
-     :background "#77aaff" :foreground "black")
+     :background "#375cc6" :foreground "black")
     (t :background "blue" :foreground "black"))
   "Face for blue bg indicator."
   :group 'q/modeline-faces)
@@ -49,9 +50,9 @@
 (defface q/modeline-indicator-cyan-bg
   '((default :inherit bold)
     (((class color) (min-colors 88) (background light))
-     :background "#006080" :foreground "white")
+     :background "#3f60af" :foreground "white")
     (((class color) (min-colors 88) (background dark))
-     :background "#40c0e0" :foreground "black")
+     :background "#3f60af" :foreground "black")
     (t :background "cyan" :foreground "black"))
   "Face for cyan bg indicator."
   :group 'q/modeline-faces)
@@ -130,8 +131,10 @@
 
 (defun q/mode-line--get-folder-path-short (length)
   (if (buffer-file-name)
-      (let ((dirs (string-split default-directory "/")))
-	(string-join (mapcar (lambda (x) (if length (string-limit x length) x)) (last dirs (or q/mode-line-folder-count (length dirs)))) "/"))))
+      (let* ((dirs (string-split default-directory "/"))
+             (lastDirs (last dirs (or q/mode-line-folder-count (length dirs))))
+             (truncatedDirs (mapcar (lambda (x) (if length (string-limit x length) x)) lastDirs)))
+	(string-join truncatedDirs "/"))))
 
 (defun q/mode-line--buffer-name (length)
   (when-let ((name (buffer-name)))
@@ -140,10 +143,12 @@
       (q/mode-line-string-truncate name))))
 
 (defcustom q/mode-line-folder-cut-each nil
-  "Cut N characters from each folder in path.")
+  "Cut N characters from each folder in path."
+  :type 'natnum)
 
 (defcustom q/mode-line-folder-count nil
-  "How many folders to show in path.")
+  "How many folders to show in path."
+  :type 'natnum)
 
 (defun q/mode-line-set-folder-cut-each (length)
   (interactive (list (read-number "Length: " q/mode-line-folder-cut-each)))
@@ -254,7 +259,7 @@
 (defun q/mode-line--vc-help-echo (file)
   (format "Revision: %s" (vc-working-revision file)))
 
-(defun q/mode-line--vc-text (file brach &optional face)
+(defun q/mode-line--vc-text (file branch &optional face)
   (concat
    (propertize (char-to-string #xE0A0) 'face 'shadow)
    " "
@@ -280,7 +285,7 @@
   (let ((count 0))
     (dolist (d (flymake-diagnostics))
       (when (= (flymake--severity type)
-               (flymake--severity (flymake-diagnostics-type d)))
+               (flymake--severity (flymake-diagnostic-type d)))
         (cl-incf count)))
     (when (cl-plusp count)
       (number-to-string count))))
@@ -310,10 +315,11 @@
 (defvar-local q/mode-line-org-clock-task
     '(:eval
       (when (and (mode-line-window-selected-p)
+                 (fboundp 'org-clock-is-active)
                  (org-clock-is-active))
         (concat
          (propertize (char-to-string #xF43A) 'face 'shadow)
-         "  "
+         " "
          (q/mode-line-string-truncate org-clock-heading 15)))))
 
 (defvar-local q/mode-line-line-number
@@ -321,7 +327,25 @@
       (when (mode-line-window-selected-p)
         " %l:%C")))
 
+(defvar-local q/mode-line-jumplist
+    '(:eval
+      (when (and (bound-and-true-p q/jumplist-mode)
+                 (mode-line-window-selected-p))
+        (format "%d / %d" (or q/jumplist--idx -1) (length q/jumplist--list)))))
+
+(defvar-local q/mode-line-misc
+    '(:eval
+      (when (mode-line-window-selected-p)
+        mode-line-misc-info)))
+
+(defvar-local q/mode-line-mule-info
+    '(:eval
+      (when (and (mode-line-window-selected-p)
+                 current-input-method-title)
+        current-input-method-title)))
+
 (dolist (construct '(
+                     q/mode-line-mule-info
                      q/mode-line-meow-state
                      q/mode-line-kbd-macro
                      q/mode-line-narrow
@@ -331,12 +355,15 @@
                      q/mode-line-vc-branch
                      q/mode-line-flymake
                      q/mode-line-org-clock-task
+                     q/mode-line-jumplist
+                     q/mode-line-misc
                      ))
   (put construct 'risky-local-variable t))
 
 (setq mode-line-compact nil)
 (setq-default mode-line-format
               '("%e"
+                q/mode-line-mule-info
                 q/mode-line-meow-state
                 q/mode-line-kbd-macro
                 q/mode-line-narrow
@@ -350,6 +377,10 @@
                 " "
                 q/mode-line-vc-branch
                 " "
+                q/mode-line-jumplist
+                " "
                 q/mode-line-flymake
+                " "
+                q/mode-line-misc
                 ))
 (provide 'modeline)
