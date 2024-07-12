@@ -100,7 +100,7 @@
     (sqlite-execute q/rem--db
                     "INSERT INTO reminders (remind_date, task_description) VALUES (?, ?)"
                     (list date task))
-    (q/notify "Reminder!" (format "%s: %s" (format-time-string "%R" date) task)))
+    (q/notify "Reminder!" (format "%s: %s" (format-time-string "%R" (string-to-number date)) task)))
   (unless (timerp q/rem--timer)
     (q/rem-run-cron)))
 
