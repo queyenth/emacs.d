@@ -7,11 +7,12 @@
   (sqlite-execute q/rem--db "CREATE TABLE reminders (task_id INTEGER PRIMARY KEY, task_description TEXT, remind_date INTEGER)")
   (setq q/rem--initialized t))
 
+(defun q/rem--format-task-for-show (task)
+  (concat (format-time-string "%d %b, %a, %R" (nth 1 task))
+          ": " (nth 0 task)))
+
 (defun q/rem--format-for-show (tasks)
-  (mapconcat (lambda (x)
-               (concat (format-time-string "%d %b, %a, %R" (nth 1 x))
-                       ": "
-                       (nth 0 x)))
+  (mapconcat #'q/rem--format-task-for-show
              tasks
              "\n"))
 
@@ -98,7 +99,8 @@
   (let ((date (format-time-string "%s" (encode-time (parse-time-string date)))))
     (sqlite-execute q/rem--db
                     "INSERT INTO reminders (remind_date, task_description) VALUES (?, ?)"
-                    (list date task)))
+                    (list date task))
+    (q/notify "Reminder!" (format "%s: %s" (format-time-string "%R" date) task)))
   (unless (timerp q/rem--timer)
     (q/rem-run-cron)))
 
