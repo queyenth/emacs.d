@@ -1111,9 +1111,22 @@ the sexp at current point."
   :init
   (add-to-list 'completion-at-point-functions #'cape-file))
 
+(use-package erc
+  :defer t
   :config
+  (setq erc-server "irc.libera.chat"
+        erc-nick "queyenth"
+        erc-user-full-name "QQQ"
+        erc-track-shorten-start 5
+        erc-kill-buffer-on-part t
+        erc-receive-query-display 'bury))
+
 (require 'smtpmail)
 (setq message-send-mail-function 'smtpmail-send-it)
+(setq smtpmail-smtp-user "queyenth@gmail.com")
+(setq smtpmail-smtp-server "smtp.gmail.com")
+(setq smtpmail-smtp-service 587)
+(setq smtpmail-stream-type 'starttls)
 
 (setq
  mailcap-download-directory "/tmp"
