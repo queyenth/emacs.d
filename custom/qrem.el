@@ -16,6 +16,7 @@
              tasks
              "\n"))
 
+(autoload #'notifications-notify "notifications" nil t)
 ;;;###autoload
 (defun q/notify (title body &optional timeout urgency sound)
   (notifications-notify
@@ -60,7 +61,10 @@
   (unless q/rem--initialized
     (q/rem--setup-db))
   (sqlite-execute q/rem--db "DELETE FROM reminders")
-  (message "Removed all reminders..."))
+  (message "Removed all reminders...")
+  (when (timerp q/rem--timer)
+    (cancel-timer q/rem--timer)
+    (setq q/rem--timer nil)))
 
 (defun q/rem--cron ()
   (let* ((query "SELECT task_id, task_description, remind_date FROM reminders WHERE remind_date <= ? ORDER BY remind_date ASC")
@@ -91,12 +95,34 @@
     (cancel-timer q/rem--timer)
     (setq q/rem--timer nil)))
 
+(defun q/delete-string-part (string from to)
+  (if (null to) (substring string 0 from)
+    (concat (substring string 0 from)
+            (substring string to nil))))
+
+(defun q/to-seconds (query)
+  "Get value as seconds. QUERY could be 30m, 2h45m, 2d, 10s."
+  (let ((seconds 0))
+    (while (not (string-blank-p query))
+      (string-match "\\([0-9]+\\)\\([smhd]\\)" query)
+      (if (= (length (match-data)) 6)
+          (let ((number (string-to-number (substring query (nth 2 (match-data)) (nth 3 (match-data)))))
+                (timetype (string-to-char (substring query (nth 4 (match-data)) (nth 5 (match-data))))))
+            (setq seconds (+ seconds (* number (cl-case timetype
+                                                      (?s 1)
+                                                      (?m 60)
+                                                      (?h (* 60 60))
+                                                      (?d (* 60 60 24))))))
+            (setq query (q/delete-string-part query (nth 0 (match-data)) (nth 1 (match-data)))))
+        (setq query "")))
+    seconds))
+
 ;;;###autoload
 (defun q/rem-reminder (date task)
-  (interactive (list (org-read-date t) (read-string "Task: ")))
+  (interactive (list (read-string "Remind in: ") (read-string "Task: ")))
   (unless q/rem--initialized
     (q/rem--setup-db))
-  (let ((date (format-time-string "%s" (encode-time (parse-time-string date)))))
+  (let ((date (format-time-string "%s" (time-add nil (q/to-seconds date)))))
     (sqlite-execute q/rem--db
                     "INSERT INTO reminders (remind_date, task_description) VALUES (?, ?)"
                     (list date task))
@@ -104,11 +130,11 @@
   (unless (timerp q/rem--timer)
     (q/rem-run-cron)))
 
+(require 'emenu)
+
 ;;;###autoload
 (defun emenu-reminder ()
-  (let ((org-read-date-popup-calendar nil))
-    (emenu (call-interactively #'q/rem-reminder))))
-
-(q/rem-show)
+  (interactive)
+  (emenu (call-interactively #'q/rem-reminder)))
 
 (provide 'qrem)
